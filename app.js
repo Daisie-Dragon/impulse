@@ -1324,7 +1324,8 @@ async function renderScenesList(threadId) {
     ghostClass:  'sortable-ghost',
     chosenClass: 'sortable-chosen',
     draggable:   '.list-item, .idea-card--thread',
-    forceFallback:       'ontouchstart' in window,
+    forceFallback:       true,
+    fallbackTolerance:   0,
     touchStartThreshold: 3,
     onEnd: async () => {
       const updates = [];
