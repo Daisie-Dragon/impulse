@@ -1324,6 +1324,8 @@ async function renderScenesList(threadId) {
     ghostClass:  'sortable-ghost',
     chosenClass: 'sortable-chosen',
     draggable:   '.list-item, .idea-card--thread',
+    forceFallback:       'ontouchstart' in window,
+    touchStartThreshold: 3,
     onEnd: async () => {
       const updates = [];
       list.querySelectorAll('.list-item').forEach((item, index) => {
@@ -1425,6 +1427,10 @@ async function openScene(sceneId) {
   currentSceneId  = scene.id;
   currentThreadId = scene.thread_id;
 
+  // Keep scenes list header in sync — matters when arriving via Continue button
+  document.getElementById('scenes-thread-title').textContent    = thread.title;
+  document.getElementById('scenes-thread-synopsis').textContent = thread.synopsis || '';
+
   document.getElementById('write-label').textContent = thread.title;
   document.getElementById('write-finish-btn').hidden = false;
   document.getElementById('write-edit-btn').hidden   = true;
@@ -1461,6 +1467,10 @@ async function openSceneViewMode(sceneId) {
 
   currentSceneId  = scene.id;
   currentThreadId = scene.thread_id;
+
+  // Keep scenes list header in sync
+  document.getElementById('scenes-thread-title').textContent    = thread.title;
+  document.getElementById('scenes-thread-synopsis').textContent = thread.synopsis || '';
 
   const label = scene.title ? `${thread.title}  ·  ${scene.title}` : thread.title;
   document.getElementById('write-label').textContent = label;
