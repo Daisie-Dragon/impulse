@@ -1,0 +1,2545 @@
+/* ═══════════════════════════════════════════════════════
+   IMPULSE — app.css
+   Pastel notebook aesthetic. Warm, soft, analogue-feeling.
+   Mobile-first, portrait orientation.
+═══════════════════════════════════════════════════════ */
+
+/* ── Design Tokens ────────────────────────────────────
+   These are the "variables" — change one here and it
+   updates everywhere in the app. Like a palette.
+─────────────────────────────────────────────────────── */
+:root {
+  /* Colours */
+  --cream:        #f5efe6;
+  --cream-dark:   #ede4d6;
+  --ink:          #2e2118;
+  --ink-soft:     #6b5744;
+  --ink-faint:    #b09e8e;
+  --rose:         #d4908a;
+  --rose-soft:    #e8c5c0;
+  --sage:         #8aab96;
+  --sage-soft:    #c5dbc9;
+  --lavender:     #9d8fbc;
+  --lavender-soft:#d4cce8;
+  --gold:         #c9a84c;
+  --gold-soft:    #e8d9a8;
+  --paper:        #faf6f0;
+  --shadow:       rgba(46, 33, 24, 0.08);
+  --shadow-md:    rgba(46, 33, 24, 0.14);
+
+  /* Typography */
+  --font-display: 'Lora', Georgia, serif;
+  --font-body:    'Nunito', system-ui, sans-serif;
+
+  /* Spacing */
+  --space-xs:  0.25rem;
+  --space-sm:  0.5rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2rem;
+  --space-2xl: 3rem;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  /* Transitions */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+
+/* ── Reset & Base ─────────────────────────────────────
+   Clears browser default styles so we start fresh.
+─────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  height: 100%;
+  font-size: 16px;
+}
+
+body {
+  height: 100%;
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--ink);
+  overflow: hidden;         /* The app handles its own scrolling */
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+
+/* ── Screen System ────────────────────────────────────
+   Every "page" in the app is a .screen div.
+   Only the one with .active is visible.
+   Screens slide in/out with CSS transitions.
+─────────────────────────────────────────────────────── */
+.screen {
+  position: fixed;
+  inset: 0;
+  background: var(--cream);
+  overflow-y: auto;
+  overflow-x: hidden;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition:
+    opacity 0.28s var(--ease),
+    transform 0.28s var(--ease);
+  /* Belt-and-suspenders: also hide from interaction when not active */
+  visibility: hidden;
+}
+
+.screen.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+  visibility: visible;
+}
+
+
+/* ── Decorative Background ────────────────────────────
+   The subtle textured feel behind the home screen.
+   Uses layered radial gradients to feel like paper.
+─────────────────────────────────────────────────────── */
+.home-bg {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, var(--rose-soft) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 80%, var(--sage-soft) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 60% 40%, var(--lavender-soft) 0%, transparent 65%),
+    var(--cream);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+
+/* ── Home Header ──────────────────────────────────────
+   The app title and the tiny settings gear in the corner.
+─────────────────────────────────────────────────────── */
+.home-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(env(safe-area-inset-top) + var(--space-xl)) var(--space-lg) var(--space-md);
+}
+
+.app-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  user-select: none;
+}
+
+.settings-btn {
+  position: absolute;
+  right: var(--space-lg);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: var(--space-sm);
+  color: var(--ink-faint);
+  border-radius: var(--radius-sm);
+  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+  margin-top: calc(env(safe-area-inset-top) / 2);
+}
+
+.settings-btn:active {
+  color: var(--ink-soft);
+  background: var(--shadow);
+}
+
+
+/* ── Home Main ────────────────────────────────────────
+   Centers the three buttons vertically on screen.
+─────────────────────────────────────────────────────── */
+.home-main {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100dvh - 6rem);
+  padding: var(--space-md) var(--space-lg) calc(var(--space-2xl) + env(safe-area-inset-bottom));
+}
+
+.mode-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+  max-width: 340px;
+}
+
+
+/* ── Mode Buttons ─────────────────────────────────────
+   The three main buttons. These are the heart of the
+   home screen. Big, tappable, satisfying.
+─────────────────────────────────────────────────────── */
+.mode-btn {
+  display: grid;
+  grid-template-columns: 2.8rem 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: var(--space-md);
+  padding: var(--space-lg) var(--space-lg);
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 2px 0 0 var(--cream-dark),
+    0 4px 16px var(--shadow),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+  text-align: left;
+  transition:
+    transform 0.18s var(--ease-spring),
+    box-shadow 0.18s var(--ease),
+    background 0.18s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle coloured left-edge accent per button */
+.mode-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  transition: opacity 0.2s var(--ease);
+  opacity: 0.6;
+}
+
+#btn-continue::before { background: var(--rose); }
+#btn-spark::before    { background: var(--gold); }
+#btn-hypothetical::before { background: var(--lavender); }
+
+.mode-btn:active {
+  transform: scale(0.97) translateY(1px);
+  box-shadow:
+    0 1px 0 0 var(--cream-dark),
+    0 2px 8px var(--shadow),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+  background: var(--cream);
+}
+
+/* The decorative symbol (◈ ✦ ◎) */
+.mode-btn__symbol {
+  grid-row: 1 / 3;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s var(--ease);
+}
+
+#btn-continue:active .mode-btn__symbol   { color: var(--rose); }
+#btn-spark:active .mode-btn__symbol      { color: var(--gold); }
+#btn-hypothetical:active .mode-btn__symbol { color: var(--lavender); }
+
+/* The main button label */
+.mode-btn__label {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.2;
+  display: block;
+}
+
+/* The small subtitle under the label */
+.mode-btn__sub {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--ink-faint);
+  display: block;
+  margin-top: 0.15rem;
+  letter-spacing: 0.01em;
+}
+
+
+/* ── Placeholder Screens ──────────────────────────────
+   Temporary stand-ins for the real mode screens.
+   These will be replaced in Phase 2.
+─────────────────────────────────────────────────────── */
+.placeholder-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+}
+
+.placeholder-label {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.placeholder-note {
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+}
+
+.back-btn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + var(--space-lg));
+  left: var(--space-lg);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s var(--ease);
+}
+
+.back-btn:active {
+  background: var(--shadow);
+}
+
+
+/* ── Overlay / Bottom Sheet ───────────────────────────
+   The settings panel that slides up from the bottom.
+   An "overlay" dims the background; a "sheet" slides up.
+─────────────────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.overlay.hidden {
+  pointer-events: none;
+}
+
+.overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(46, 33, 24, 0.35);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+
+.overlay:not(.hidden) .overlay-backdrop {
+  opacity: 1;
+}
+
+.sheet {
+  position: relative;
+  background: var(--paper);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: var(--space-sm) var(--space-xl) calc(var(--space-2xl) + env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 32px var(--shadow-md);
+  transform: translateY(100%);
+  transition: transform 0.35s var(--ease-spring);
+}
+
+.overlay:not(.hidden) .sheet {
+  transform: translateY(0);
+}
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--ink-faint);
+  border-radius: 2px;
+  margin: 0 auto var(--space-lg);
+  opacity: 0.4;
+}
+
+.sheet-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: var(--space-sm);
+}
+
+.sheet-note {
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  line-height: 1.5;
+  margin-bottom: var(--space-xl);
+}
+
+.sheet-close {
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--cream-dark);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  transition: background 0.15s var(--ease);
+}
+
+.sheet-close:active {
+  background: var(--rose-soft);
+}
+
+
+/* ── Button entrance animation ────────────────────────
+   The three home buttons gently fade + rise in on load.
+─────────────────────────────────────────────────────── */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mode-btn {
+  animation: rise-in 0.5s var(--ease) both;
+}
+
+.mode-btn:nth-child(1) { animation-delay: 0.05s; }
+.mode-btn:nth-child(2) { animation-delay: 0.12s; }
+.mode-btn:nth-child(3) { animation-delay: 0.19s; }
+
+
+/* ── Dark Mode ────────────────────────────────────────
+   Automatically activates if the phone is in dark mode.
+   Swaps the warm creams for deep, muted tones.
+─────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cream:        #1c1610;
+    --cream-dark:   #261e14;
+    --ink:          #f0e8dc;
+    --ink-soft:     #c4b09a;
+    --ink-faint:    #7a6a58;
+    --paper:        #231a10;
+    --shadow:       rgba(0, 0, 0, 0.25);
+    --shadow-md:    rgba(0, 0, 0, 0.4);
+    --rose-soft:    rgba(212, 144, 138, 0.15);
+    --sage-soft:    rgba(138, 171, 150, 0.12);
+    --lavender-soft:rgba(157, 143, 188, 0.12);
+  }
+}
+
+/* ── Manual theme overrides ───────────────────────────
+   data-theme="dark" forces dark regardless of system.
+   data-theme="light" forces light regardless of system.
+   No attribute = follow system (media query above).
+─────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --cream:        #1c1610;
+  --cream-dark:   #261e14;
+  --ink:          #f0e8dc;
+  --ink-soft:     #c4b09a;
+  --ink-faint:    #7a6a58;
+  --paper:        #231a10;
+  --shadow:       rgba(0, 0, 0, 0.25);
+  --shadow-md:    rgba(0, 0, 0, 0.4);
+  --rose-soft:    rgba(212, 144, 138, 0.15);
+  --sage-soft:    rgba(138, 171, 150, 0.12);
+  --lavender-soft:rgba(157, 143, 188, 0.12);
+}
+
+[data-theme="light"] {
+  --cream:        #f5efe6 !important;
+  --cream-dark:   #ede4d6 !important;
+  --ink:          #2e2118 !important;
+  --ink-soft:     #6b5744 !important;
+  --ink-faint:    #b09e8e !important;
+  --paper:        #faf6f0 !important;
+  --shadow:       rgba(46, 33, 24, 0.08) !important;
+  --shadow-md:    rgba(46, 33, 24, 0.14) !important;
+  --rose-soft:    #e8c5c0 !important;
+  --sage-soft:    #c5dbc9 !important;
+  --lavender-soft:#d4cce8 !important;
+}
+
+/* Force light backgrounds on screens and cards when light mode is manually selected */
+[data-theme="light"] .list-item {
+  background: rgba(255, 248, 247, 0.85);
+  box-shadow: 0 2px 0 0 rgba(212, 144, 138, 0.15), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+[data-theme="light"] .spark-card {
+  background: rgba(255, 252, 240, 0.85);
+  box-shadow: 0 2px 0 0 rgba(201, 168, 76, 0.15), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+[data-theme="light"] .hyp-card {
+  background: rgba(240, 238, 252, 0.85);
+  box-shadow: 0 2px 0 0 rgba(157, 143, 188, 0.2), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+[data-theme="light"] .char-answer-item {
+  background: rgba(240, 238, 252, 0.85);
+  box-shadow: 0 2px 0 0 rgba(157, 143, 188, 0.2), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+[data-theme="light"] #screen-spark        { background: linear-gradient(160deg, #fdf6e3 0%, #faf0d0 40%, #f7ece0 100%); }
+[data-theme="light"] #screen-threads,
+[data-theme="light"] #screen-scenes        { background: linear-gradient(160deg, #fdf0ee 0%, #f9e0dc 40%, #faf0ee 100%); }
+[data-theme="light"] #screen-hypothetical,
+[data-theme="light"] #screen-hyp-characters { background: linear-gradient(160deg, #f2f0fa 0%, #e8e2f5 40%, #f0eef8 100%); }
+[data-theme="light"] #screen-write          { background: linear-gradient(160deg, #fdf0ee 0%, #faf4f2 40%, #fdf0ee 100%); }
+[data-theme="light"] #screen-hyp-write      { background: linear-gradient(160deg, #f4f2fb 0%, #f0edf8 40%, #f4f2fb 100%); }
+[data-theme="light"] #screen-spark-write,
+[data-theme="light"] #screen-sticky-write   { background: linear-gradient(160deg, #fdf8ee 0%, #faf4e8 40%, #fdf8ee 100%); }
+[data-theme="light"] #screen-write .write-header       { background: rgba(253, 240, 238, 0.82) !important; }
+[data-theme="light"] #screen-spark-write .write-header { background: rgba(253, 246, 227, 0.82) !important; }
+[data-theme="light"] #screen-hyp-write .write-header   { background: rgba(242, 240, 250, 0.82) !important; }
+[data-theme="light"] #screen-sticky-write .write-header { background: rgba(253, 240, 238, 0.82) !important; }
+[data-theme="light"] .nav-header           { background: rgba(250, 246, 240, 0.82) !important; }
+[data-theme="light"] .nav-header--rose     { background: rgba(253, 240, 238, 0.82) !important; }
+[data-theme="light"] .nav-header--gold     { background: rgba(253, 246, 227, 0.82) !important; }
+[data-theme="light"] .nav-header--lavender { background: rgba(242, 240, 250, 0.82) !important; }
+
+/* Force dark backgrounds on screens and cards when dark mode is manually selected */
+[data-theme="dark"] .list-item {
+  background: rgba(28, 14, 12, 0.9);
+  box-shadow: 0 2px 0 0 rgba(212, 144, 138, 0.1), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+[data-theme="dark"] .spark-card {
+  background: rgba(30, 24, 10, 0.9);
+  box-shadow: 0 2px 0 0 rgba(201, 168, 76, 0.1), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+[data-theme="dark"] .hyp-card {
+  background: rgba(18, 14, 28, 0.9);
+  box-shadow: 0 2px 0 0 rgba(157, 143, 188, 0.1), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+[data-theme="dark"] .char-answer-item {
+  background: rgba(32, 24, 50, 0.97);
+  box-shadow: 0 2px 0 0 rgba(157, 143, 188, 0.35), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+[data-theme="dark"] #screen-spark          { background: linear-gradient(160deg, #1e1a0e 0%, #221c0a 40%, #1c1510 100%); }
+[data-theme="dark"] #screen-threads,
+[data-theme="dark"] #screen-scenes          { background: linear-gradient(160deg, #1e1010 0%, #220e0a 40%, #1c1010 100%); }
+[data-theme="dark"] #screen-hypothetical,
+[data-theme="dark"] #screen-hyp-characters  { background: linear-gradient(160deg, #130f1e 0%, #170e22 40%, #130f1e 100%); }
+[data-theme="dark"] #screen-write           { background: linear-gradient(160deg, #1e1010 0%, #1a1010 40%, #1e1010 100%); }
+[data-theme="dark"] #screen-hyp-write       { background: linear-gradient(160deg, #110f1a 0%, #130f1c 40%, #110f1a 100%); }
+[data-theme="dark"] #screen-spark-write,
+[data-theme="dark"] #screen-sticky-write    { background: linear-gradient(160deg, #1a1810 0%, #1c1a0e 40%, #1a1810 100%); }
+[data-theme="dark"] #screen-write .write-header       { background: rgba(30, 16, 16, 0.82) !important; }
+[data-theme="dark"] #screen-spark-write .write-header { background: rgba(30, 26, 14, 0.82) !important; }
+[data-theme="dark"] #screen-hyp-write .write-header   { background: rgba(19, 15, 30, 0.82) !important; }
+[data-theme="dark"] #screen-sticky-write .write-header { background: rgba(30, 16, 16, 0.82) !important; }
+[data-theme="dark"] .nav-header           { background: rgba(28, 22, 16, 0.82) !important; }
+[data-theme="dark"] .nav-header--rose     { background: rgba(30, 16, 16, 0.82) !important; }
+[data-theme="dark"] .nav-header--gold     { background: rgba(30, 26, 14, 0.82) !important; }
+[data-theme="dark"] .nav-header--lavender { background: rgba(19, 15, 30, 0.82) !important; }
+
+/* ── Theme toggle button group ────────────────────────*/
+.theme-toggle {
+  display: flex;
+  gap: 0;
+  background: var(--cream);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  margin-top: var(--space-sm);
+}
+
+.theme-btn {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: calc(var(--radius-md) - 3px);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink-faint);
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.theme-btn.active {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 1px 4px var(--shadow);
+}
+
+.theme-btn:active:not(.active) {
+  color: var(--ink-soft);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   PHASE 2 — CONTINUE MODE STYLES
+═══════════════════════════════════════════════════════ */
+
+/* ── Nav Header ───────────────────────────────────────
+   The top bar used across all inner screens.
+   Has a back button, a title, and an action button (+).
+   --rose / --gold / --lavender variants set accent colour.
+─────────────────────────────────────────────────────── */
+.nav-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: calc(env(safe-area-inset-top) + var(--space-md)) var(--space-md) var(--space-md);
+  background: var(--paper);
+  border-bottom: 1px solid var(--cream-dark);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav-header .back-btn {
+  /* Override the absolute positioning from Phase 1 */
+  position: static;
+  transform: none;
+  margin-top: 0;
+  padding: var(--space-sm);
+  color: var(--ink-soft);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: background 0.15s var(--ease);
+}
+
+.nav-header .back-btn:active {
+  background: var(--shadow);
+}
+
+.nav-header__title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--ink);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-header__symbol {
+  color: var(--rose);
+  font-style: normal;
+}
+
+.nav-header--rose .nav-header__symbol { color: var(--rose); }
+.nav-header--gold .nav-header__symbol { color: var(--gold); }
+.nav-header--lavender .nav-header__symbol { color: var(--lavender); }
+
+/* When the header has a title + subtitle stacked */
+.nav-header__title-block {
+  flex: 1;
+  overflow: hidden;
+}
+
+.nav-header__title-block .nav-header__title {
+  display: block;
+}
+
+.nav-header__subtitle {
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+  font-style: italic;
+}
+
+/* The + button in the top-right corner */
+.nav-header__action {
+  padding: var(--space-sm);
+  color: var(--ink-soft);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: color 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.nav-header__action:active {
+  color: var(--rose);
+  background: var(--shadow);
+}
+
+.nav-header--gold .nav-header__action:active   { color: var(--gold); }
+.nav-header--lavender .nav-header__action:active { color: var(--lavender); }
+
+
+/* ── List Body ────────────────────────────────────────
+   The scrollable area that holds list items.
+─────────────────────────────────────────────────────── */
+.list-body {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom));
+}
+
+
+/* ── List Item ────────────────────────────────────────
+   One thread or scene in the list.
+   Styled to match the spark/hyp card language — rose tint.
+─────────────────────────────────────────────────────── */
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(255, 248, 247, 0.85);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 2px 0 0 rgba(212, 144, 138, 0.15),
+    0 4px 16px var(--shadow),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  cursor: pointer;
+  transition: transform 0.18s var(--ease-spring), box-shadow 0.18s var(--ease);
+  text-align: left;
+  width: 100%;
+  border: none;
+  font-family: inherit;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Rose left-edge accent stripe — mirrors spark/hyp cards */
+.list-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--rose);
+  opacity: 0.5;
+  border-radius: 0 2px 2px 0;
+}
+
+.list-item:active {
+  transform: scale(0.97) translateY(1px);
+  box-shadow: 0 1px 6px var(--shadow);
+}
+
+@media (prefers-color-scheme: dark) {
+  .list-item {
+    background: rgba(28, 14, 12, 0.9);
+    box-shadow:
+      0 2px 0 0 rgba(212, 144, 138, 0.1),
+      0 4px 16px var(--shadow),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+}
+
+.list-item__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--rose);
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.list-item--complete .list-item__dot {
+  opacity: 1;
+  background: var(--sage);
+}
+
+.list-item__body {
+  flex: 1;
+  overflow: hidden;
+}
+
+.list-item__title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.list-item__title--untitled {
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+.list-item__sub {
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.list-item__chevron {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+  opacity: 0.4;
+}
+
+/* Complete badge on scenes */
+.list-item__badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--sage);
+  background: var(--sage-soft);
+  padding: 2px 7px;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+
+
+/* ── Empty State ──────────────────────────────────────
+   Friendly message shown when a list has nothing in it.
+─────────────────────────────────────────────────────── */
+.empty-state {
+  display: none;  /* Hidden by default; JS sets display:'' to show */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) var(--space-xl);
+  text-align: center;
+  min-height: 50vh;
+}
+
+.empty-state__icon {
+  font-size: 2rem;
+  color: var(--ink-faint);
+  opacity: 0.4;
+  margin-bottom: var(--space-sm);
+}
+
+.empty-state__title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.empty-state__sub {
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+  line-height: 1.5;
+}
+
+
+/* ── Writing Screen ───────────────────────────────────
+   The full-screen text editor. Minimal, calm, focused.
+─────────────────────────────────────────────────────── */
+.write-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: calc(env(safe-area-inset-top) + var(--space-sm)) var(--space-md) var(--space-sm);
+  background: var(--paper);
+  border-bottom: 1px solid var(--cream-dark);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  /* Fades out after a moment so the writing surface is uninterrupted */
+  transition: opacity 0.4s var(--ease);
+}
+
+.write-header.faded {
+  opacity: 0.15;
+}
+
+.write-header .back-btn {
+  position: static;
+  transform: none;
+  margin-top: 0;
+  padding: var(--space-sm);
+  color: var(--ink-soft);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.write-header__label {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The "finish" button — small, unobtrusive */
+.write-finish-btn {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--rose);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+  flex-shrink: 0;
+}
+
+.write-finish-btn:active {
+  background: var(--rose-soft);
+}
+
+/* The actual text area */
+.write-body {
+  height: calc(100dvh - 56px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.write-textarea {
+  width: 100%;
+  flex: 1; /* fills remaining space after sparks panel */
+  min-height: 60vh; /* enough room to write even when panel is open */
+  padding: var(--space-xl) var(--space-xl) calc(var(--space-2xl) * 3);
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--ink);
+  caret-color: var(--rose);
+}
+
+.write-textarea::placeholder {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+
+/* ── Sheet Fields ─────────────────────────────────────
+   Input fields inside the bottom sheet modals.
+─────────────────────────────────────────────────────── */
+.field-group {
+  margin-bottom: var(--space-lg);
+}
+
+.field-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--space-sm);
+}
+
+.field-required {
+  color: var(--rose);
+}
+
+.field-input,
+.field-textarea {
+  width: 100%;
+  background: var(--cream);
+  border: 1.5px solid var(--cream-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  -webkit-appearance: none;
+}
+
+.field-input:focus,
+.field-textarea:focus {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px rgba(212, 144, 138, 0.2);
+}
+
+.field-textarea {
+  resize: none;
+  line-height: 1.6;
+}
+
+.field-textarea--short {
+  min-height: 80px;
+}
+
+
+/* ── Sheet Actions ────────────────────────────────────
+   Buttons at the bottom of a modal sheet.
+─────────────────────────────────────────────────────── */
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--rose);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  transition: background 0.15s var(--ease), transform 0.12s var(--ease-spring);
+}
+
+.btn-primary:active {
+  background: var(--rose-soft);
+  color: var(--rose);
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  background: transparent;
+  color: var(--ink-faint);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  transition: background 0.15s var(--ease);
+}
+
+.btn-ghost:active {
+  background: var(--shadow);
+}
+
+
+/* ── Finish Modal Extras ──────────────────────────────
+   The little checkmark celebration at the top of the
+   post-finish sheet.
+─────────────────────────────────────────────────────── */
+.finish-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.finish-checkmark {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--sage-soft);
+  color: var(--sage);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  animation: pop-in 0.4s var(--ease-spring) both;
+}
+
+@keyframes pop-in {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+
+/* ── View Mode & Edit Button ──────────────────────────
+   When a completed scene is opened, the write screen
+   enters view mode: read-only textarea, edit button shown.
+─────────────────────────────────────────────────────── */
+
+/* Subtle tint to signal read-only state */
+.write-header--view {
+  background: var(--cream);
+  border-bottom-color: var(--cream-dark);
+}
+
+.write-header--view ~ .write-body .write-textarea {
+  color: var(--ink-soft);
+  cursor: default;
+}
+
+/* The edit button — mirrors the finish button style
+   but uses the sage/green colour to suggest "resume" */
+.write-edit-btn {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--sage);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  transition: background 0.15s var(--ease);
+  flex-shrink: 0;
+}
+
+.write-edit-btn:active {
+  background: var(--sage-soft);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   DRAG-TO-REORDER & MARKDOWN PREVIEW STYLES
+═══════════════════════════════════════════════════════ */
+
+/* ── Drag Handle ──────────────────────────────────────
+   The grip icon on each scene card. Hidden by default,
+   revealed when the user taps the reorder button.
+─────────────────────────────────────────────────────── */
+.list-item__drag {
+  color: var(--ink-faint);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease);
+  flex-shrink: 0;
+  padding: 0 var(--space-xs);
+  cursor: grab;
+  touch-action: none;
+}
+
+/* Reorder mode — show handles, hide chevrons */
+.list-body--reorder .list-item__drag {
+  opacity: 0.5;
+  pointer-events: all;
+}
+
+.list-body--reorder .list-item__chevron {
+  opacity: 0;
+}
+
+.list-body--reorder .list-item__badge {
+  opacity: 0.4;
+}
+
+/* While actively dragging */
+.list-item.sortable-ghost {
+  opacity: 0.35;
+  background: var(--cream-dark);
+}
+
+.list-item.sortable-chosen {
+  box-shadow: 0 6px 24px var(--shadow-md);
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+/* Reorder toggle button in the nav header */
+.nav-header__reorder {
+  padding: var(--space-sm);
+  color: var(--ink-faint);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: color 0.15s var(--ease), background 0.15s var(--ease);
+  flex-shrink: 0;
+}
+
+.nav-header__reorder:active,
+.nav-header__reorder.active {
+  color: var(--rose);
+  background: var(--rose-soft);
+}
+
+
+/* ── Markdown Preview ─────────────────────────────────
+   Shown in view mode (completed scenes).
+   In write mode the plain textarea is shown instead.
+─────────────────────────────────────────────────────── */
+.write-preview {
+  width: 100%;
+  min-height: 100%;
+  padding: var(--space-xl) var(--space-xl) calc(var(--space-2xl) * 3);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* In write mode, show the textarea and hide preview */
+.write-body .write-textarea { display: block; }
+.write-body .write-preview  { display: none;  }
+
+/* In view mode (applied via JS), swap them */
+.write-body--preview .write-textarea { display: none;  }
+.write-body--preview .write-preview  { display: block; }
+
+/* Rendered Markdown elements inside the preview */
+.write-preview strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.write-preview em {
+  font-style: italic;
+}
+
+.write-preview strong em,
+.write-preview em strong {
+  font-weight: 600;
+  font-style: italic;
+}
+
+
+
+/* ═══════════════════════════════════════════════════════
+   DELETION & ACTION SHEET STYLES
+═══════════════════════════════════════════════════════ */
+
+/* ── Settings section ─────────────────────────────────*/
+.settings-section {
+  margin-bottom: var(--space-xl);
+}
+
+.settings-section__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--space-sm);
+}
+
+.settings-section__hint {
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  line-height: 1.5;
+  margin-top: var(--space-sm);
+}
+
+/* ── Danger buttons ───────────────────────────────────*/
+.btn-danger {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  background: transparent;
+  border: 1.5px solid var(--rose);
+  color: var(--rose);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.btn-danger:active {
+  background: var(--rose-soft);
+}
+
+.btn-danger-confirm {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--rose);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  transition: background 0.15s var(--ease), transform 0.12s var(--ease-spring);
+}
+
+.btn-danger-confirm:active {
+  background: #c0706a;
+  transform: scale(0.98);
+}
+
+/* ── Action sheet ─────────────────────────────────────
+   The long-press context menu for threads and scenes.
+─────────────────────────────────────────────────────── */
+.action-sheet__title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-bottom: var(--space-lg);
+  padding: 0 var(--space-sm);
+}
+
+.action-sheet__btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-md) var(--space-sm);
+  border-bottom: 1px solid var(--cream-dark);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink);
+  transition: background 0.15s var(--ease);
+  text-align: left;
+}
+
+.action-sheet__btn:last-child {
+  border-bottom: none;
+}
+
+.action-sheet__btn:active {
+  background: var(--shadow);
+}
+
+.action-sheet__btn--danger {
+  color: var(--rose);
+}
+
+#action-sheet-cancel {
+  margin-top: var(--space-md);
+}
+
+/* Long-press visual feedback on list items */
+.list-item.pressing {
+  background: var(--rose-soft);
+  transform: scale(0.98);
+}
+
+
+/* ── Home Button ──────────────────────────────────────
+   Always the leftmost button on every inner screen.
+   Styled subtly — present but not competing for attention.
+─────────────────────────────────────────────────────── */
+.home-btn {
+  padding: var(--space-sm);
+  color: var(--ink-faint);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: color 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.home-btn:active {
+  color: var(--ink-soft);
+  background: var(--shadow);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   SPARK MODE STYLES
+═══════════════════════════════════════════════════════ */
+
+/* ── Spark screen atmosphere ──────────────────────────
+   Gives Spark a warmer, more golden background so it
+   feels visually distinct from Continue the moment
+   you enter it.
+─────────────────────────────────────────────────────── */
+#screen-spark {
+  background: linear-gradient(
+    160deg,
+    #fdf6e3 0%,
+    #faf0d0 40%,
+    #f7ece0 100%
+  );
+}
+
+@media (prefers-color-scheme: dark) {
+  #screen-spark {
+    background: linear-gradient(
+      160deg,
+      #1e1a0e 0%,
+      #221c0a 40%,
+      #1c1510 100%
+    );
+  }
+}
+
+/* Gold accent variants */
+.nav-header__symbol--gold      { color: var(--gold); }
+.write-finish-btn--gold        { color: var(--gold); }
+.write-finish-btn--gold:active { background: var(--gold-soft); }
+.btn-primary--gold             { background: var(--gold); }
+.btn-primary--gold:active      { background: var(--gold-soft); color: var(--ink); }
+.finish-checkmark--gold        { background: var(--gold-soft); color: var(--gold); }
+
+/* ── Spark card ───────────────────────────────────────
+   Replaces the generic .list-item for Spark entries.
+   Taller, more expressive — idea as header, conclusion
+   preview below it.
+─────────────────────────────────────────────────────── */
+.spark-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: rgba(255, 252, 240, 0.85);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 2px 0 0 rgba(201, 168, 76, 0.15),
+    0 4px 16px var(--shadow),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  cursor: pointer;
+  transition:
+    transform 0.18s var(--ease-spring),
+    box-shadow 0.18s var(--ease);
+  text-align: left;
+  width: 100%;
+  border: none;
+  font-family: inherit;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (prefers-color-scheme: dark) {
+  .spark-card {
+    background: rgba(30, 24, 10, 0.9);
+    box-shadow:
+      0 2px 0 0 rgba(201, 168, 76, 0.1),
+      0 4px 16px var(--shadow),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+}
+
+.spark-card:active {
+  transform: scale(0.97) translateY(1px);
+  box-shadow: 0 1px 6px var(--shadow);
+}
+
+/* Gold left-edge accent */
+.spark-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--gold);
+  opacity: 0.5;
+  border-radius: 0 2px 2px 0;
+  transition: opacity 0.2s var(--ease);
+}
+
+.spark-card--complete::before {
+  background: var(--sage);
+  opacity: 0.7;
+}
+
+/* Wrapper that hard-clips the prompt — prevents any pixel bleed below the ellipsis */
+.spark-card__prompt-wrap {
+  padding: var(--space-md) var(--space-lg) var(--space-sm);
+  overflow: hidden;
+}
+
+/* The idea/prompt — the "header" of the card */
+.spark-card__prompt {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.spark-card--complete .spark-card__prompt-wrap {
+  padding-bottom: 0;
+}
+
+.spark-card--complete .spark-card__prompt {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  -webkit-line-clamp: 2;
+}
+
+/* Divider between prompt and conclusion preview */
+.spark-card__divider {
+  height: 1px;
+  background: linear-gradient(to right, rgba(201,168,76,0.3), transparent);
+  margin: var(--space-sm) var(--space-lg) 0;
+}
+
+/* The conclusion preview — just a teaser */
+.spark-card__conclusion {
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  line-height: 1.5;
+  font-style: italic;
+  /* Max 2 lines, then ellipsis */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Footer row: word count + checkmark */
+.spark-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg) var(--space-md);
+}
+
+.spark-card__meta {
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  opacity: 0.7;
+}
+
+/* Unanswered tag — sits below the clamped prompt, never overlaps */
+.spark-card__unanswered {
+  display: block;
+  width: fit-content;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-soft);
+  padding: 2px 8px;
+  border-radius: 99px;
+  margin: 0 var(--space-lg) var(--space-md);
+  flex-shrink: 0;
+}
+
+/* ── Archive section ──────────────────────────────────*/
+.archive-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-md) calc(var(--space-lg) + var(--space-xs));
+  color: var(--ink-faint);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.15s var(--ease);
+}
+
+.archive-toggle:active            { color: var(--ink-soft); }
+.archive-toggle__chevron          { transition: transform 0.2s var(--ease); }
+.archive-toggle.open .archive-toggle__chevron { transform: rotate(90deg); }
+.archive-list                     { padding-top: 0; opacity: 0.7; }
+
+
+/* Gold edit button variant for Spark */
+.write-edit-btn--gold {
+  color: var(--gold);
+}
+.write-edit-btn--gold:active {
+  background: var(--gold-soft);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   SPARK INLINE IDEA EDITOR
+═══════════════════════════════════════════════════════ */
+
+/* The idea block sits at the top of the write body */
+.spark-idea-block {
+  padding: var(--space-xl) var(--space-xl) 0;
+}
+
+/* The idea textarea — auto-grows, styled as a prompt header */
+.spark-idea-field {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  caret-color: var(--gold);
+  overflow: hidden; /* no scrollbar — we auto-resize via JS */
+}
+
+.spark-idea-field::placeholder {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+/* Read-only state in view mode */
+.spark-idea-field:read-only {
+  cursor: default;
+}
+
+/* The divider between idea and conclusion */
+.spark-idea-divider {
+  height: 1px;
+  background: linear-gradient(to right, rgba(201,168,76,0.4), transparent);
+  margin: var(--space-md) 0 0;
+}
+
+/* Conclusion textarea — sits below the idea */
+.spark-conclusion-textarea {
+  padding-top: var(--space-md);
+}
+
+/* Preview div in spark — needs to account for the idea block above */
+.spark-preview-with-idea {
+  padding-top: var(--space-md);
+}
+
+/* In-progress indicator on spark cards */
+.spark-card__in-progress {
+  font-size: 0.7rem;
+  color: var(--gold);
+  font-style: italic;
+  opacity: 0.85;
+}
+
+/* ── Screen atmosphere tints ──────────────────────────
+   Each mode has its own subtle background colour so
+   you always know where you are at a glance.
+─────────────────────────────────────────────────────── */
+
+/* Continue — warm rose/red */
+#screen-threads,
+#screen-scenes {
+  background: linear-gradient(
+    160deg,
+    #fdf0ee 0%,
+    #f9e0dc 40%,
+    #faf0ee 100%
+  );
+}
+
+/* Hypothetical — soft lavender */
+#screen-hypothetical,
+#screen-hyp-characters {
+  background: linear-gradient(
+    160deg,
+    #f2f0fa 0%,
+    #e8e2f5 40%,
+    #f0eef8 100%
+  );
+}
+
+@media (prefers-color-scheme: dark) {
+  #screen-threads,
+  #screen-scenes {
+    background: linear-gradient(
+      160deg,
+      #1e1010 0%,
+      #220e0a 40%,
+      #1c1010 100%
+    );
+  }
+
+  #screen-hypothetical,
+  #screen-hyp-characters {
+    background: linear-gradient(
+      160deg,
+      #130f1e 0%,
+      #170e22 40%,
+      #130f1e 100%
+    );
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   HYPOTHETICAL MODE STYLES
+═══════════════════════════════════════════════════════ */
+
+/* Lavender accent variants */
+.nav-header__symbol--lavender              { color: var(--lavender); }
+.write-finish-btn--lavender                { color: var(--lavender); }
+.write-finish-btn--lavender:active         { background: var(--lavender-soft); }
+.btn-primary--lavender                     { background: var(--lavender); }
+.btn-primary--lavender:active              { background: var(--lavender-soft); color: var(--ink); }
+.field-input--lavender:focus               { border-color: var(--lavender); box-shadow: 0 0 0 3px rgba(157,143,188,0.2); }
+
+/* ── Hypothetical card ────────────────────────────────*/
+.hyp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: rgba(240, 238, 252, 0.85);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 2px 0 0 rgba(157, 143, 188, 0.2),
+    0 4px 16px var(--shadow),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  cursor: pointer;
+  transition: transform 0.18s var(--ease-spring), box-shadow 0.18s var(--ease);
+  text-align: left;
+  width: 100%;
+  border: none;
+  font-family: inherit;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (prefers-color-scheme: dark) {
+  .hyp-card {
+    background: rgba(18, 14, 28, 0.9);
+    box-shadow:
+      0 2px 0 0 rgba(157, 143, 188, 0.1),
+      0 4px 16px var(--shadow),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+}
+
+.hyp-card:active {
+  transform: scale(0.97) translateY(1px);
+  box-shadow: 0 1px 6px var(--shadow);
+}
+
+.hyp-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--lavender);
+  opacity: 0.6;
+  border-radius: 0 2px 2px 0;
+}
+
+/* The question text */
+/* Character chips row */
+.hyp-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  padding: 0 var(--space-lg) var(--space-md);
+  align-items: center;
+}
+
+.hyp-chip {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 99px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+/* Answered character chip */
+.hyp-chip--answered {
+  background: var(--lavender);
+  color: white;
+  opacity: 0.85;
+}
+
+/* Unanswered character chip */
+.hyp-chip--unanswered {
+  background: var(--lavender-soft);
+  color: var(--lavender);
+  border: 1px solid var(--lavender);
+  opacity: 0.6;
+}
+
+/* Overflow indicator "+N more" */
+.hyp-chip--more {
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 0.68rem;
+  padding: 0 4px;
+}
+
+/* No characters yet */
+.hyp-card__no-chars {
+  padding: 0 var(--space-lg) var(--space-md);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+/* ── Character answers list ───────────────────────────*/
+/* ── Character answer cards ───────────────────────────
+   Uses the same shadow system as .hyp-card — lavender
+   accent bottom shadow, full drop shadow, inset highlight.
+─────────────────────────────────────────────────────── */
+.char-answer-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(240, 238, 252, 0.85);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 2px 0 0 rgba(157, 143, 188, 0.2),
+    0 4px 16px var(--shadow),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  cursor: pointer;
+  transition: transform 0.18s var(--ease-spring), box-shadow 0.18s var(--ease);
+  text-align: left;
+  width: 100%;
+  border: none;
+  font-family: inherit;
+}
+
+.char-answer-item:active {
+  transform: scale(0.97) translateY(1px);
+  box-shadow: 0 1px 6px var(--shadow);
+}
+
+@media (prefers-color-scheme: dark) {
+  .char-answer-item {
+    background: rgba(32, 24, 50, 0.97);
+    box-shadow:
+      0 2px 0 0 rgba(157, 143, 188, 0.35),
+      0 4px 16px var(--shadow),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+}
+
+.char-answer-item__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--lavender-soft);
+  color: var(--lavender);
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+}
+
+.char-answer-item--answered .char-answer-item__avatar {
+  background: var(--lavender);
+  color: white;
+}
+
+.char-answer-item__body {
+  flex: 1;
+  overflow: hidden;
+}
+
+.char-answer-item__name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink);
+  display: block;
+}
+
+.char-answer-item__preview {
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  margin-top: 2px;
+  font-style: italic;
+}
+
+.char-answer-item__chevron {
+  color: var(--ink-faint);
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+/* ── Write header with two-line label ─────────────────*/
+.write-header__title-block {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.write-header__sublabel {
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Manage characters modal ──────────────────────────*/
+.char-add-row {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.char-input {
+  flex: 1;
+}
+
+.char-add-btn {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--lavender);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  transition: background 0.15s var(--ease);
+}
+
+.char-add-btn:active {
+  background: var(--lavender-soft);
+  color: var(--lavender);
+}
+
+.char-list-manage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.char-manage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+}
+
+.char-manage-item__name {
+  font-size: 0.95rem;
+  color: var(--ink);
+  font-family: var(--font-display);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.char-manage-item__delete {
+  color: var(--ink-faint);
+  font-size: 1.1rem;
+  padding: 0 var(--space-sm);
+  transition: color 0.15s var(--ease);
+}
+
+.char-manage-item__delete:active {
+  color: var(--rose);
+}
+
+/* ── Character archive styles ─────────────────────────*/
+.char-archive-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: var(--space-md) 0 var(--space-sm);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.char-archive-divider::before,
+.char-archive-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--cream-dark);
+}
+
+.char-manage-item--archived {
+  opacity: 0.6;
+}
+
+.char-manage-item--archived .char-manage-item__name {
+  font-style: italic;
+}
+
+.char-manage-item__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.char-manage-item__restore {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--lavender);
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--lavender-soft);
+  transition: background 0.15s var(--ease);
+}
+
+.char-manage-item__restore:active {
+  background: var(--lavender);
+  color: white;
+}
+
+.char-manage-item__archive {
+  color: var(--ink-faint);
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  transition: color 0.15s var(--ease);
+  display: flex;
+  align-items: center;
+}
+
+.char-manage-item__archive:active {
+  color: var(--rose);
+}
+
+/* Hypothetical in-progress answer states */
+.hyp-chip--inprog {
+  background: transparent;
+  color: var(--lavender);
+  border: 1.5px dashed var(--lavender);
+  opacity: 0.7;
+}
+
+.char-answer-item--inprog .char-answer-item__avatar {
+  background: transparent;
+  border: 2px dashed var(--lavender);
+  color: var(--lavender);
+}
+
+.char-answer-item__preview--inprog {
+  color: var(--lavender);
+  opacity: 0.8;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   CROSS-MODE / STICKY SPARK STYLES
+═══════════════════════════════════════════════════════ */
+
+/* ── Thread spark button in scenes header ─────────────*/
+.nav-header__spark-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--gold);
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s var(--ease);
+  flex-shrink: 0;
+  opacity: 0.7;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.nav-header__spark-btn:active { background: var(--gold-soft); opacity: 1; }
+
+/* ── Shared idea card style (thread & scene level) ────*/
+.idea-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(201, 168, 76, 0.07);
+  border-radius: var(--radius-md);
+  border: 1.5px dashed rgba(201, 168, 76, 0.35);
+  cursor: pointer;
+  transition: background 0.15s var(--ease), transform 0.12s var(--ease-spring);
+  position: relative;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+.idea-card:active {
+  background: rgba(201, 168, 76, 0.13);
+  transform: scale(0.98);
+}
+
+.idea-card__icon {
+  font-size: 1.1rem;
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: 1px;
+  opacity: 0.8;
+}
+
+.idea-card__body { flex: 1; overflow: hidden; min-width: 0; }
+
+.idea-card__preview {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  max-height: calc(0.9rem * 1.5 * 2);
+}
+
+.idea-card__meta {
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  margin-top: 3px;
+}
+
+/* ── Scene sparks panel (top of write screen) ─────────*/
+.scene-sparks-panel {
+  border-bottom: 1px solid rgba(201, 168, 76, 0.25);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.scene-sparks-header {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-lg) var(--space-sm) var(--space-xl);
+}
+
+.scene-sparks-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+  padding: var(--space-xs) 0;
+}
+
+.scene-sparks-toggle__icon { font-size: 0.9rem; }
+
+.scene-sparks-toggle__chevron {
+  transition: transform 0.2s var(--ease);
+  opacity: 0.7;
+}
+.scene-sparks-toggle.open .scene-sparks-toggle__chevron {
+  transform: rotate(180deg);
+}
+
+.scene-sparks-add-btn {
+  font-size: 0.72rem;
+  color: var(--gold);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  opacity: 0.85;
+  transition: opacity 0.15s var(--ease), background 0.15s var(--ease);
+  flex-shrink: 0;
+}
+.scene-sparks-add-btn:active { opacity: 1; background: var(--gold-soft); }
+
+@media (prefers-color-scheme: dark) {
+  .scene-sparks-panel {
+    border-bottom-color: rgba(201, 168, 76, 0.18);
+    background: rgba(201, 168, 76, 0.04);
+  }
+  .scene-sparks-toggle { font-weight: 600; }
+  .scene-sparks-add-btn { opacity: 0.6; }
+}
+
+.scene-sparks-list {
+  padding: 0 var(--space-lg) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Empty strip — faint prompt when scene has no ideas */
+.scene-sparks-empty-strip {
+  padding: var(--space-sm) var(--space-xl);
+  border-bottom: 1px solid rgba(201, 168, 76, 0.25);
+  background: rgba(255, 255, 255, 0.75);
+}
+.scene-sparks-empty-btn {
+  font-size: 0.72rem;
+  color: var(--gold);
+  opacity: 0.75;
+  font-style: italic;
+  transition: opacity 0.15s var(--ease);
+}
+.scene-sparks-empty-btn:active { opacity: 1; }
+
+@media (prefers-color-scheme: dark) {
+  .scene-sparks-empty-strip {
+    border-bottom-color: rgba(201, 168, 76, 0.12);
+    background: transparent;
+  }
+  .scene-sparks-empty-btn { opacity: 0.45; }
+}
+
+/* Pick thread/scene list in modal */
+.pick-list {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-bottom: var(--space-md);
+}
+
+/* Sticky spark editor screen — warm gold tint */
+/* Lavender edit button variant for Hypotheticals */
+.write-edit-btn--lavender { color: var(--lavender); }
+.write-edit-btn--lavender:active { background: var(--lavender-soft); }
+
+/* ── Character grid layout ────────────────────────────
+   Characters list displays as a 2-column grid instead
+   of a single vertical list.
+─────────────────────────────────────────────────────── */
+#hyp-characters-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom));
+}
+
+/* Grid items need different layout — avatar centred above name */
+.char-answer-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-md);
+  text-align: center;
+  border-radius: var(--radius-lg);
+  min-width: 0;
+}
+
+.char-answer-item__avatar {
+  width: 48px;
+  height: 48px;
+  font-size: 1.1rem;
+}
+
+.char-answer-item__body {
+  overflow: hidden;
+  width: 100%;
+}
+
+.char-answer-item__name {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.char-answer-item__preview {
+  font-size: 0.7rem;
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+}
+
+/* Hide chevron in grid mode */
+.char-answer-item .char-answer-item__chevron {
+  display: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   VISUAL POLISH — batch fixes
+═══════════════════════════════════════════════════════ */
+
+/* ── 1b. Coloured write headers per mode ──────────────*/
+/* Scene write screen — rose frosted glass */
+#screen-write .write-header {
+  background: rgba(253, 240, 238, 0.82) !important;
+  border-bottom-color: rgba(212, 144, 138, 0.18) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+/* Spark write screen — gold frosted glass */
+#screen-spark-write .write-header {
+  background: rgba(253, 246, 227, 0.82) !important;
+  border-bottom-color: rgba(201, 168, 76, 0.18) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+/* Hyp write screen — lavender frosted glass */
+#screen-hyp-write .write-header {
+  background: rgba(242, 240, 250, 0.82) !important;
+  border-bottom-color: rgba(157, 143, 188, 0.18) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@media (prefers-color-scheme: dark) {
+  #screen-write .write-header       { background: rgba(30, 16, 16, 0.82) !important; }
+  #screen-spark-write .write-header { background: rgba(30, 26, 14, 0.82) !important; }
+  #screen-hyp-write .write-header   { background: rgba(19, 15, 30, 0.82) !important; }
+}
+
+/* ── 1c. Scene write background — faint rose tint ─────*/
+#screen-write {
+  background: linear-gradient(160deg, #fdf0ee 0%, #faf4f2 40%, #fdf0ee 100%);
+}
+#screen-hyp-write {
+  background: linear-gradient(160deg, #f4f2fb 0%, #f0edf8 40%, #f4f2fb 100%);
+}
+#screen-spark-write,
+#screen-sticky-write {
+  background: linear-gradient(160deg, #fdf8ee 0%, #faf4e8 40%, #fdf8ee 100%);
+}
+@media (prefers-color-scheme: dark) {
+  #screen-write {
+    background: linear-gradient(160deg, #1e1010 0%, #1a1010 40%, #1e1010 100%);
+  }
+  #screen-hyp-write {
+    background: linear-gradient(160deg, #110f1a 0%, #130f1c 40%, #110f1a 100%);
+  }
+  #screen-spark-write,
+  #screen-sticky-write {
+    background: linear-gradient(160deg, #1a1810 0%, #1c1a0e 40%, #1a1810 100%);
+  }
+}
+
+/* ── 2. Thread-level ideas ────────────────────────────
+   Indented symmetrically, white-ish base to stand out
+   against the rose background.
+─────────────────────────────────────────────────────── */
+.idea-card--thread {
+  background: rgba(255, 252, 240, 0.92);
+  border-color: rgba(201, 168, 76, 0.5);
+  margin-left: var(--space-md);
+  margin-right: var(--space-md);
+  width: auto;
+}
+@media (prefers-color-scheme: dark) {
+  .idea-card--thread {
+    background: rgba(201, 168, 76, 0.07);
+    border-color: rgba(201, 168, 76, 0.35);
+  }
+}
+
+/* ── 3. Drag — tap anywhere on card, hide handle ──────
+   In reorder mode: hide the grip icon, the whole card
+   is draggable (handled via SortableJS filter removal).
+   The handle CSS stays but is invisible.
+─────────────────────────────────────────────────────── */
+.list-body--reorder .list-item__drag {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+.list-body--reorder .idea-card__drag {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* Idea card icon — centre it with the text */
+.idea-card__icon {
+  font-size: 1.1rem;
+  color: var(--gold);
+  flex-shrink: 0;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  align-self: center;
+  margin-top: 0;
+  line-height: 1;
+}
+
+/* ── 5. Scene-level idea panel — bigger tap targets ───*/
+.scene-sparks-toggle {
+  padding: var(--space-md) 0;
+  font-size: 0.8rem;
+}
+
+.scene-sparks-add-btn {
+  font-size: 0.82rem;
+  padding: var(--space-sm) var(--space-md);
+  opacity: 0.75;
+}
+
+/* ── 6. Settings section spacing — tighter ────────────*/
+.settings-section {
+  margin-bottom: var(--space-md);
+}
+
+.settings-section__hint {
+  margin-top: var(--space-xs);
+  font-size: 0.73rem;
+}
+
+/* ── 7. Hyp chips — show up to 8 ─────────────────────
+   No CSS change needed — handled in JS (MAX_CHIPS).     */
+
+/* ── 8a. Spark conclusion preview — fix ellipsis ──────
+   The prompt-wrap approach: ensure max-height clips cleanly.
+   2 lines for concluded, 3 for unanswered (already set).  */
+.spark-card__conclusion {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+/* ── 8d. Hyp answer preview — no ellipsis if short ───*/
+.char-answer-item__preview {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* Only show ellipsis if text actually overflows */
+  text-overflow: ellipsis;
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* ── 9. Dark mode card highlight — dimmer ────────────*/
+@media (prefers-color-scheme: dark) {
+  .list-item       { box-shadow: 0 2px 0 0 rgba(212,144,138,0.1), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.04); }
+  .spark-card      { box-shadow: 0 2px 0 0 rgba(201,168,76,0.1), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.03); }
+  .hyp-card        { box-shadow: 0 2px 0 0 rgba(157,143,188,0.1), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.03); }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   SECOND VISUAL POLISH BATCH
+═══════════════════════════════════════════════════════ */
+
+/* ── Frosted glass nav header ─────────────────────────
+   Semi-transparent with blur so scrolling content
+   diffuses through rather than clashing.
+─────────────────────────────────────────────────────── */
+.nav-header {
+  background: rgba(250, 246, 240, 0.82) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(46, 33, 24, 0.08) !important;
+}
+
+.nav-header--rose {
+  background: rgba(253, 240, 238, 0.82) !important;
+  border-bottom-color: rgba(212, 144, 138, 0.18) !important;
+}
+.nav-header--gold {
+  background: rgba(253, 246, 227, 0.82) !important;
+  border-bottom-color: rgba(201, 168, 76, 0.18) !important;
+}
+.nav-header--lavender {
+  background: rgba(242, 240, 250, 0.82) !important;
+  border-bottom-color: rgba(157, 143, 188, 0.18) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .nav-header           { background: rgba(28, 22, 16, 0.82) !important; }
+  .nav-header--rose     { background: rgba(30, 16, 16, 0.82) !important; }
+  .nav-header--gold     { background: rgba(30, 26, 14, 0.82) !important; }
+  .nav-header--lavender { background: rgba(19, 15, 30, 0.82) !important; }
+}
+
+/* ── No header fade in write mode ─────────────────────*/
+.write-header { opacity: 1 !important; transition: none !important; }
+.write-header.faded { opacity: 1 !important; }
+
+/* ── Sticky idea editor header — rose frosted glass ──
+   Identical to the scene write screen header.
+─────────────────────────────────────────────────────── */
+#screen-sticky-write .write-header {
+  background: rgba(253, 240, 238, 0.82) !important;
+  border-bottom-color: rgba(212, 144, 138, 0.18) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@media (prefers-color-scheme: dark) {
+  #screen-sticky-write .write-header { background: rgba(30, 16, 16, 0.82) !important; }
+}
+
+/* Scene-level idea cards — dashed gold, matching thread ideas */
+.idea-card--scene {
+  border: 1.5px dashed rgba(201, 168, 76, 0.4);
+}
+@media (prefers-color-scheme: dark) {
+  .idea-card--scene {
+    border-color: rgba(201, 168, 76, 0.25);
+  }
+}
+
+/* ── Hyp card question — fix 2-line bleed ─────────────
+   Using wrapper approach same as spark card.
+─────────────────────────────────────────────────────── */
+.hyp-card__question-wrap {
+  padding: var(--space-md) var(--space-lg) var(--space-sm);
+  overflow: hidden;
+}
+.hyp-card__question {
+  padding: 0;
+  max-height: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+
+/* ── Manual theme — remaining hardcoded overrides ──────
+   Covers elements not handled by CSS variable changes.
+─────────────────────────────────────────────────────── */
+
+/* Scene sparks panel */
+[data-theme="dark"] .scene-sparks-panel {
+  border-bottom-color: rgba(201, 168, 76, 0.18);
+  background: rgba(201, 168, 76, 0.04);
+}
+[data-theme="dark"] .scene-sparks-toggle { font-weight: 600; color: var(--gold); }
+[data-theme="dark"] .scene-sparks-add-btn { opacity: 0.6; color: var(--gold); }
+[data-theme="dark"] .scene-sparks-empty-strip {
+  border-bottom-color: rgba(201, 168, 76, 0.12);
+  background: transparent;
+}
+[data-theme="dark"] .scene-sparks-empty-btn { opacity: 0.45; color: var(--gold); }
+
+[data-theme="light"] .scene-sparks-panel {
+  border-bottom-color: rgba(201, 168, 76, 0.25);
+  background: rgba(255, 255, 255, 0.75);
+}
+[data-theme="light"] .scene-sparks-toggle { font-weight: 700; color: var(--gold); }
+[data-theme="light"] .scene-sparks-add-btn { opacity: 0.85; color: var(--gold); }
+[data-theme="light"] .scene-sparks-empty-strip {
+  border-bottom-color: rgba(201, 168, 76, 0.25);
+  background: rgba(255, 255, 255, 0.75);
+}
+[data-theme="light"] .scene-sparks-empty-btn { opacity: 0.75; color: var(--gold); }
+
+/* Idea card thread — dark */
+[data-theme="dark"] .idea-card--thread {
+  background: rgba(201, 168, 76, 0.07);
+  border-color: rgba(201, 168, 76, 0.35);
+}
+[data-theme="light"] .idea-card--thread {
+  background: rgba(255, 252, 240, 0.92);
+  border-color: rgba(201, 168, 76, 0.5);
+}
+
+/* Idea card scene — dark */
+[data-theme="dark"] .idea-card--scene { border-color: rgba(201, 168, 76, 0.25); }
+[data-theme="light"] .idea-card--scene { border-color: rgba(201, 168, 76, 0.4); }
+
+/* Card shadows — dark mode polish batch */
+[data-theme="dark"] .list-item  { box-shadow: 0 2px 0 0 rgba(212,144,138,0.1), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.04); }
+[data-theme="dark"] .spark-card { box-shadow: 0 2px 0 0 rgba(201,168,76,0.1), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.03); }
+[data-theme="dark"] .hyp-card   { box-shadow: 0 2px 0 0 rgba(157,143,188,0.1), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.03); }
+
+/* Sticky write header */
+[data-theme="dark"] #screen-sticky-write .write-header { background: rgba(30, 16, 16, 0.82) !important; }
+[data-theme="light"] #screen-sticky-write .write-header { background: rgba(253, 240, 238, 0.82) !important; }

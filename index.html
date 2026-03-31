@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f5efe6" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Impulse" />
+  <title>Impulse</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="app.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       HOME SCREEN
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-home" class="screen active">
+    <div class="home-bg"></div>
+    <header class="home-header">
+      <h1 class="app-title">impulse</h1>
+      <button class="settings-btn" id="settings-btn" aria-label="Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </header>
+    <main class="home-main">
+      <div class="mode-buttons">
+        <button class="mode-btn" id="btn-continue" data-mode="continue">
+          <span class="mode-btn__symbol">◈</span>
+          <span class="mode-btn__label">Continue</span>
+          <span class="mode-btn__sub">pick up where you left off</span>
+        </button>
+        <button class="mode-btn" id="btn-spark" data-mode="spark">
+          <span class="mode-btn__symbol">✦</span>
+          <span class="mode-btn__label">Spark</span>
+          <span class="mode-btn__sub">ideas & impulse writing</span>
+        </button>
+        <button class="mode-btn" id="btn-hypothetical" data-mode="hypothetical">
+          <span class="mode-btn__symbol">◎</span>
+          <span class="mode-btn__label">Hypothetical</span>
+          <span class="mode-btn__sub">what would they do?</span>
+        </button>
+      </div>
+    </main>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       CONTINUE — THREADS LIST
+       All your stories. Shown when there's no recent
+       scene to jump into, or when navigating back.
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-threads" class="screen">
+    <header class="nav-header nav-header--rose">
+      <button class="home-btn" data-target="home" aria-label="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <h2 class="nav-header__title">
+        <span class="nav-header__symbol">◈</span> Threads
+      </h2>
+      <button class="nav-header__action" id="btn-new-thread" aria-label="New thread">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </header>
+    <div class="list-body" id="threads-list"></div>
+    <div class="empty-state" id="threads-empty">
+      <p class="empty-state__icon">◈</p>
+      <p class="empty-state__title">No threads yet</p>
+      <p class="empty-state__sub">Tap + to start your first story.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       CONTINUE — SCENES LIST
+       All scenes within one thread.
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-scenes" class="screen">
+    <header class="nav-header nav-header--rose">
+      <button class="home-btn" id="scenes-home-btn" aria-label="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <button class="back-btn" id="scenes-back-btn" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="nav-header__title-block">
+        <h2 class="nav-header__title" id="scenes-thread-title">Thread</h2>
+        <p class="nav-header__subtitle" id="scenes-thread-synopsis"></p>
+      </div>
+      <button class="nav-header__spark-btn" id="btn-new-thread-spark" aria-label="Add spark to thread" title="Add a spark to this thread">✦</button>
+      <button class="nav-header__reorder" id="btn-reorder-scenes" aria-label="Reorder scenes" hidden>reorder</button>
+      <button class="nav-header__action" id="btn-new-scene" aria-label="New scene">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </header>
+    <div class="list-body" id="scenes-list"></div>
+    <div class="empty-state" id="scenes-empty">
+      <p class="empty-state__icon">✧</p>
+      <p class="empty-state__title">No scenes yet</p>
+      <p class="empty-state__sub">Tap + to write the first scene.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       CONTINUE — SCENE WRITING SCREEN
+       The main writing surface. Nothing but text.
+       The textarea holds raw text; the preview div
+       shows it rendered with Markdown styling.
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-write" class="screen">
+    <header class="write-header" id="write-header">
+      <button class="home-btn" id="write-home-btn" aria-label="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <button class="back-btn write-back" id="write-back-btn" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="write-header__label" id="write-label"></span>
+      <button class="write-edit-btn" id="write-edit-btn" hidden>edit</button>
+      <button class="write-finish-btn" id="write-finish-btn">finish</button>
+    </header>
+    <div class="write-body">
+      <!-- Scene ideas — inline collapsible cards above writing area -->
+      <div id="scene-sparks-panel" class="scene-sparks-panel" hidden>
+        <div class="scene-sparks-header">
+          <button class="scene-sparks-toggle" id="scene-sparks-toggle">
+            <span class="scene-sparks-toggle__icon">✦</span>
+            <span class="scene-sparks-toggle__label" id="scene-sparks-label">Ideas</span>
+            <svg class="scene-sparks-toggle__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button class="scene-sparks-add-btn" id="btn-new-scene-spark">+ add</button>
+        </div>
+        <div id="scene-sparks-list" class="scene-sparks-list"></div>
+      </div>
+
+      <!-- Always-visible "add idea" strip when no ideas yet -->
+      <div id="scene-sparks-empty-strip" class="scene-sparks-empty-strip" hidden>
+        <button class="scene-sparks-empty-btn" id="btn-new-scene-spark-empty">✦ add an idea to this scene</button>
+      </div>
+
+      <textarea
+        id="write-textarea"
+        class="write-textarea"
+        placeholder="begin writing…"
+        spellcheck="true"
+        autocorrect="on"
+        autocapitalize="sentences"
+      ></textarea>
+      <div id="write-preview" class="write-preview" hidden></div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL — POST-FINISH
+       After tapping "finish", optionally name the scene.
+  ═══════════════════════════════════════════════ -->
+  <div id="finish-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="finish-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="finish-header">
+        <span class="finish-checkmark">✓</span>
+        <h2 class="sheet-title">Scene complete</h2>
+      </div>
+      <p class="sheet-note">Want to give this scene a name or note? Totally optional.</p>
+      <div class="field-group">
+        <label class="field-label" for="finish-title">Scene title</label>
+        <input type="text" id="finish-title" class="field-input" placeholder="optional" autocapitalize="words" />
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="finish-synopsis">Brief note</label>
+        <textarea id="finish-synopsis" class="field-textarea field-textarea--short" placeholder="optional" autocapitalize="sentences"></textarea>
+      </div>
+      <div class="sheet-actions">
+        <button class="btn-primary" id="finish-save-btn">Save & close</button>
+        <button class="btn-ghost" id="finish-skip-btn">Skip</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL — NEW THREAD
+       Slides up when tapping + on Threads screen.
+  ═══════════════════════════════════════════════ -->
+  <div id="new-thread-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="new-thread-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">New thread</h2>
+      <div class="field-group">
+        <label class="field-label" for="new-thread-title">Story title <span class="field-required">*</span></label>
+        <input type="text" id="new-thread-title" class="field-input" placeholder="what's this story called?" autocapitalize="words" />
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="new-thread-synopsis">Synopsis</label>
+        <textarea id="new-thread-synopsis" class="field-textarea field-textarea--short" placeholder="optional — a line or two about the story" autocapitalize="sentences"></textarea>
+      </div>
+      <div class="sheet-actions">
+        <button class="btn-primary" id="new-thread-save-btn">Create & start writing</button>
+        <button class="btn-ghost" id="new-thread-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL — EDIT THREAD
+  ═══════════════════════════════════════════════ -->
+  <div id="edit-thread-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="edit-thread-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">Edit thread</h2>
+      <div class="field-group">
+        <label class="field-label" for="edit-thread-title">Story title <span class="field-required">*</span></label>
+        <input type="text" id="edit-thread-title" class="field-input" placeholder="what's this story called?" autocapitalize="words" />
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="edit-thread-synopsis">Synopsis</label>
+        <textarea id="edit-thread-synopsis" class="field-textarea field-textarea--short" placeholder="optional" autocapitalize="sentences"></textarea>
+      </div>
+      <div class="sheet-actions">
+        <button class="btn-primary" id="edit-thread-save-btn">Save</button>
+        <button class="btn-ghost" id="edit-thread-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ═══════════════════════════════════════════════
+       SPARK — IDEAS LIST
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-spark" class="screen">
+    <header class="nav-header nav-header--gold">
+      <button class="home-btn" data-target="home" aria-label="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <h2 class="nav-header__title">
+        <span class="nav-header__symbol nav-header__symbol--gold">✦</span> Spark
+      </h2>
+      <button class="nav-header__action" id="btn-new-spark" aria-label="New idea">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </header>
+    <div class="list-body" id="spark-list"></div>
+    <div class="empty-state" id="spark-empty">
+      <p class="empty-state__icon">✦</p>
+      <p class="empty-state__title">No ideas yet</p>
+      <p class="empty-state__sub">Tap + to capture your first spark.</p>
+    </div>
+    <!-- Archive section — shown at bottom when archived items exist -->
+    <div id="spark-archive-section" hidden>
+      <button class="archive-toggle" id="spark-archive-toggle">
+        <span class="archive-toggle__label">Archive</span>
+        <svg class="archive-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="list-body archive-list" id="spark-archive-list" hidden></div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SPARK — WRITING SCREEN
+       Idea field at top (always editable), conclusion
+       writing area below. One unified screen.
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-spark-write" class="screen">
+    <header class="write-header" id="spark-write-header">
+      <button class="home-btn" id="spark-write-home-btn" aria-label="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <button class="back-btn" id="spark-write-back-btn" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="write-header__label">Spark</span>
+      <button class="write-edit-btn write-edit-btn--gold" id="spark-edit-btn" hidden>edit</button>
+      <button class="write-finish-btn write-finish-btn--gold" id="spark-finish-btn">finish</button>
+    </header>
+
+    <div class="write-body" id="spark-write-body">
+      <!-- Idea field — always at the top, always editable -->
+      <div class="spark-idea-block" id="spark-idea-block">
+        <textarea
+          id="spark-idea-field"
+          class="spark-idea-field"
+          placeholder="the idea…"
+          spellcheck="true"
+          autocorrect="on"
+          autocapitalize="sentences"
+          rows="1"
+        ></textarea>
+        <div class="spark-idea-divider"></div>
+      </div>
+
+      <!-- Conclusion writing area -->
+      <textarea
+        id="spark-textarea"
+        class="write-textarea spark-conclusion-textarea"
+        placeholder="write freely…"
+        spellcheck="true"
+        autocorrect="on"
+        autocapitalize="sentences"
+      ></textarea>
+      <div id="spark-preview" class="write-preview spark-preview-with-idea" hidden></div>
+    </div>
+  </div>
+
+
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL — SPARK FINISH
+       Simple confirmation — no title field.
+  ═══════════════════════════════════════════════ -->
+  <div id="spark-finish-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="spark-finish-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="finish-header">
+        <span class="finish-checkmark finish-checkmark--gold">✦</span>
+        <h2 class="sheet-title">Conclude this Spark?</h2>
+      </div>
+      <p class="sheet-note">Once concluded, this Spark will be marked complete. You can always reopen it to edit.</p>
+      <div class="sheet-actions">
+        <button class="btn-primary btn-primary--gold" id="spark-finish-save-btn">Yes, conclude it</button>
+        <button class="btn-ghost" id="spark-finish-skip-btn">Not yet</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       HYPOTHETICAL — LIST
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-hypothetical" class="screen">
+    <header class="nav-header nav-header--lavender">
+      <button class="home-btn" data-target="home" aria-label="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <h2 class="nav-header__title">
+        <span class="nav-header__symbol nav-header__symbol--lavender">◎</span> Hypotheticals
+      </h2>
+      <button class="nav-header__action" id="btn-new-hyp" aria-label="New hypothetical">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </header>
+    <div class="list-body" id="hyp-list"></div>
+    <div class="empty-state" id="hyp-empty">
+      <p class="empty-state__icon">◎</p>
+      <p class="empty-state__title">No hypotheticals yet</p>
+      <p class="empty-state__sub">Tap + to pose your first question.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       HYPOTHETICAL — CHARACTER ANSWERS LIST
+       Shows after tapping a hypothetical.
+       Lists all characters; tap one to write their answer.
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-hyp-characters" class="screen">
+    <header class="nav-header nav-header--lavender">
+      <button class="home-btn" data-target="home" aria-label="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <button class="back-btn" id="hyp-chars-back-btn" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="nav-header__title-block">
+        <h2 class="nav-header__title" id="hyp-chars-title">Hypothetical</h2>
+      </div>
+      <button class="nav-header__action nav-header__action--manage" id="btn-manage-characters" aria-label="Manage characters" title="Manage characters">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </button>
+    </header>
+    <div class="list-body" id="hyp-characters-list"></div>
+    <div class="empty-state" id="hyp-characters-empty">
+      <p class="empty-state__icon">◎</p>
+      <p class="empty-state__title">No characters yet</p>
+      <p class="empty-state__sub">Tap the person icon to add characters.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       HYPOTHETICAL — ANSWER WRITING SCREEN
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-hyp-write" class="screen">
+    <header class="write-header" id="hyp-write-header">
+      <button class="home-btn" id="hyp-write-home-btn" aria-label="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <button class="back-btn" id="hyp-write-back-btn" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="write-header__title-block">
+        <span class="write-header__label" id="hyp-write-character"></span>
+        <span class="write-header__sublabel" id="hyp-write-question"></span>
+      </div>
+      <button class="write-edit-btn write-edit-btn--lavender" id="hyp-edit-btn" hidden>edit</button>
+      <button class="write-finish-btn write-finish-btn--lavender" id="hyp-finish-btn">finish</button>
+    </header>
+    <div class="write-body">
+      <textarea
+        id="hyp-textarea"
+        class="write-textarea"
+        placeholder="how would they answer…"
+        spellcheck="true"
+        autocorrect="on"
+        autocapitalize="sentences"
+      ></textarea>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL — NEW HYPOTHETICAL
+  ═══════════════════════════════════════════════ -->
+  <div id="new-hyp-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="new-hyp-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">New hypothetical</h2>
+      <div class="field-group">
+        <label class="field-label" for="new-hyp-question">The question <span class="field-required">*</span></label>
+        <input type="text" id="new-hyp-question" class="field-input field-input--lavender" placeholder="what kind of Uber driver would they be?" autocapitalize="sentences" />
+      </div>
+      <div class="sheet-actions">
+        <button class="btn-primary btn-primary--lavender" id="new-hyp-save-btn">Add hypothetical</button>
+        <button class="btn-ghost" id="new-hyp-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL — MANAGE CHARACTERS
+       Global character list — add/remove names.
+  ═══════════════════════════════════════════════ -->
+  <div id="manage-chars-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="manage-chars-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">Characters</h2>
+      <p class="sheet-note">This list is shared across all hypotheticals.</p>
+      <div class="char-add-row">
+        <input type="text" id="new-char-input" class="field-input field-input--lavender char-input" placeholder="Add a character…" autocapitalize="words" />
+        <button class="char-add-btn" id="char-add-btn">Add</button>
+      </div>
+      <div id="char-list-manage" class="char-list-manage"></div>
+      <button class="sheet-close" id="manage-chars-close">Done</button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       STICKY SPARK EDITOR
+       Full-screen editor for thread/scene ideas.
+       No conclusion — just the idea text.
+  ═══════════════════════════════════════════════ -->
+  <div id="screen-sticky-write" class="screen">
+    <header class="write-header" id="sticky-write-header">
+      <button class="home-btn" id="sticky-write-home-btn" aria-label="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <button class="back-btn" id="sticky-write-back-btn" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="write-header__label" id="sticky-write-label"></span>
+      <button class="write-finish-btn write-finish-btn--gold" id="sticky-write-done-btn">done</button>
+    </header>
+    <div class="write-body">
+      <textarea
+        id="sticky-write-textarea"
+        class="write-textarea"
+        placeholder="the idea…"
+        spellcheck="true"
+        autocorrect="on"
+        autocapitalize="sentences"
+      ></textarea>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL — PROMOTE SPARK
+       Options when promoting a complete Spark.
+  ═══════════════════════════════════════════════ -->
+  <div id="promote-spark-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="promote-spark-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">Promote Spark</h2>
+      <p class="sheet-note" id="promote-spark-note"></p>
+      <div class="sheet-actions" id="promote-spark-actions"></div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL — PICK THREAD (for attach/promote flows)
+  ═══════════════════════════════════════════════ -->
+  <div id="pick-thread-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="pick-thread-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title" id="pick-thread-title">Choose a thread</h2>
+      <div class="list-body pick-list" id="pick-thread-list"></div>
+    </div>
+  </div>
+
+
+  <div id="settings-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="settings-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">Settings</h2>
+
+      <div class="settings-section">
+        <p class="settings-section__label">Appearance</p>
+        <div class="theme-toggle" id="theme-toggle">
+          <button class="theme-btn active" data-theme="system">System</button>
+          <button class="theme-btn" data-theme="light">Light</button>
+          <button class="theme-btn" data-theme="dark">Dark</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <p class="settings-section__label">Backup</p>
+        <button class="btn-primary" id="export-btn">Export all data</button>
+        <p class="settings-section__hint">Downloads a JSON file with all your threads, scenes, sparks, hypotheticals, and characters. Keep it somewhere safe.</p>
+      </div>
+
+      <div class="settings-section">
+        <p class="settings-section__label">Restore</p>
+        <button class="btn-danger" id="import-btn">Restore from backup…</button>
+        <p class="settings-section__hint">Loads a previously exported backup file. <strong>This will replace all current data.</strong></p>
+        <input type="file" id="import-file-input" accept=".json" hidden />
+      </div>
+
+      <div class="settings-section">
+        <p class="settings-section__label">Data</p>
+        <button class="btn-danger" id="clear-data-btn">Clear all data…</button>
+        <p class="settings-section__hint">Permanently deletes all threads, scenes, sparks, and characters.</p>
+      </div>
+
+      <button class="sheet-close" id="settings-close">Done</button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       CONFIRM RESTORE MODAL
+  ═══════════════════════════════════════════════ -->
+  <div id="confirm-restore-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="confirm-restore-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">Restore from backup?</h2>
+      <p class="sheet-note">This will <strong>replace everything</strong> in the app with the contents of your backup file. Your current threads, scenes, sparks, hypotheticals, and characters will all be overwritten.</p>
+      <p class="sheet-note" id="confirm-restore-filename" style="font-style:italic;color:var(--ink-faint)"></p>
+      <div class="sheet-actions">
+        <button class="btn-danger-confirm" id="confirm-restore-btn">Yes, restore backup</button>
+        <button class="btn-ghost" id="confirm-restore-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       CONFIRM CLEAR DATA MODAL
+       Double-confirmation so it can't be done by accident.
+  ═══════════════════════════════════════════════ -->
+  <div id="confirm-clear-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="confirm-clear-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">Clear all data?</h2>
+      <p class="sheet-note">This will permanently delete <strong>everything</strong> — all threads, scenes, sparks, hypotheticals, and characters. This cannot be undone.</p>
+      <div class="sheet-actions">
+        <button class="btn-danger-confirm" id="confirm-clear-btn">Yes, delete everything</button>
+        <button class="btn-ghost" id="confirm-clear-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       ACTION SHEET
+       Generic long-press context menu.
+       Used for delete on threads and scenes.
+  ═══════════════════════════════════════════════ -->
+  <div id="action-sheet-overlay" class="overlay hidden">
+    <div class="overlay-backdrop" id="action-sheet-backdrop"></div>
+    <div class="sheet" id="action-sheet">
+      <div class="sheet-handle"></div>
+      <p class="action-sheet__title" id="action-sheet-title"></p>
+      <div id="action-sheet-buttons"></div>
+      <button class="btn-ghost" id="action-sheet-cancel">Cancel</button>
+    </div>
+  </div>
+
+
+  <script src="app.js"></script>
+</body>
+</html>
