@@ -2551,9 +2551,16 @@ openDB()
 
 function applyTheme(theme) {
   const root = document.documentElement;
-  if (theme === 'dark')   root.setAttribute('data-theme', 'dark');
-  else if (theme === 'light') root.setAttribute('data-theme', 'light');
-  else                    root.removeAttribute('data-theme');
+  if (theme === 'dark')        root.setAttribute('data-theme', 'dark');
+  else if (theme === 'light')  root.setAttribute('data-theme', 'light');
+  else                         root.removeAttribute('data-theme');
+
+  // Update theme-color meta tags to match
+  const isDark = theme === 'dark' ||
+    (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.querySelectorAll('meta[name="theme-color"]').forEach(el => {
+    el.setAttribute('content', isDark ? '#1c1610' : '#f5efe6');
+  });
 
   // Update active button state
   document.querySelectorAll('.theme-btn').forEach(btn => {
