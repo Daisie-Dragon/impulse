@@ -1324,8 +1324,6 @@ async function renderScenesList(threadId) {
     ghostClass:  'sortable-ghost',
     chosenClass: 'sortable-chosen',
     draggable:   '.list-item, .idea-card--thread',
-    forceFallback:       true,
-    fallbackTolerance:   0,
     touchStartThreshold: 3,
     onEnd: async () => {
       const updates = [];
@@ -2036,6 +2034,7 @@ async function deleteScene(sceneId) {
 /* Long-press a scene → Reorder / Edit title & note / Delete */
 function attachSceneLongPress(element, scene, sceneTitle) {
   addLongPress(element, () => {
+    if (reorderModeOn) return;
     showActionSheet(`"${sceneTitle}"`, [
       {
         label:  'Reorder',
@@ -2173,6 +2172,7 @@ function makeIdeaCard(spark, level) {
   });
 
   addLongPress(card, () => {
+    if (reorderModeOn) return;
     const actions = [];
     if (level === 'thread') {
       actions.push({ label: 'Reorder', danger: false, action: () => enterReorderMode() });

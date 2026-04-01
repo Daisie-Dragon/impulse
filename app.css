@@ -1119,7 +1119,17 @@ button {
   touch-action: none;
 }
 
-/* Reorder mode — show handles, hide chevrons */
+/* Reorder mode — show handles, hide chevrons, disable text selection */
+.list-body--reorder {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.list-body--reorder .list-item,
+.list-body--reorder .idea-card--thread {
+  touch-action: none;
+}
+
 .list-body--reorder .list-item__drag {
   opacity: 0.5;
   pointer-events: all;
