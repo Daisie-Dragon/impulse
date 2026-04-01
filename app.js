@@ -1318,12 +1318,15 @@ async function renderScenesList(threadId) {
   // Initialise or reinitialise SortableJS — covers scenes and thread ideas together
   if (sceneSortable) sceneSortable.destroy();
 
+  const isTouch = navigator.maxTouchPoints > 0;
   sceneSortable = Sortable.create(list, {
     handle:    '.list-item__drag',
     animation: 150,
     ghostClass:  'sortable-ghost',
     chosenClass: 'sortable-chosen',
     draggable:   '.list-item, .idea-card--thread',
+    forceFallback:       isTouch,
+    fallbackOnBody:      isTouch,
     touchStartThreshold: 3,
     onEnd: async () => {
       const updates = [];
