@@ -1143,16 +1143,15 @@ button {
   opacity: 0.4;
 }
 
-/* While actively dragging */
-.list-item.sortable-ghost {
-  opacity: 0.35;
-  background: var(--cream-dark);
+/* While actively dragging — ghost hidden, chosen card dims slightly */
+.list-item.sortable-ghost,
+.idea-card.sortable-ghost {
+  opacity: 0;
 }
 
-.list-item.sortable-chosen {
-  box-shadow: 0 6px 24px var(--shadow-md);
-  transform: scale(1.02);
-  z-index: 10;
+.list-item.sortable-chosen,
+.idea-card.sortable-chosen {
+  opacity: 0.6;
 }
 
 /* Reorder toggle button in the nav header */
