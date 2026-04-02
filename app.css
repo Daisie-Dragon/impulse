@@ -519,6 +519,10 @@ button {
 [data-theme="light"] .nav-header--rose     { background: rgba(253, 240, 238, 0.82) !important; }
 [data-theme="light"] .nav-header--gold     { background: rgba(253, 246, 227, 0.82) !important; }
 [data-theme="light"] .nav-header--lavender { background: rgba(242, 240, 250, 0.82) !important; }
+[data-theme="light"] .mode-btn {
+  background: var(--paper);
+  box-shadow: 0 2px 0 0 var(--cream-dark), 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.8);
+}
 
 /* Force dark backgrounds on screens and cards when dark mode is manually selected */
 [data-theme="dark"] .list-item {
