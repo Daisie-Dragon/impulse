@@ -1675,10 +1675,19 @@ document.getElementById('btn-new-scene').addEventListener('click', async () => {
   const now     = Date.now();
   const sceneId = generateId();
 
+  // Find the lowest existing sort_order so the new scene lands above everything
+  const existing = await dbGetByIndex('scenes', 'thread_id', currentThreadId);
+  const minOrder = existing.reduce((min, s) => {
+    if (s.sort_order != null) return Math.min(min, s.sort_order);
+    return min;
+  }, 0);
+
   await dbPut('scenes', {
     id: sceneId, thread_id: currentThreadId,
     title: '', synopsis: '', body: '',
-    is_complete: false, created_at: now, updated_at: now,
+    is_complete: false,
+    sort_order: minOrder - 1,
+    created_at: now, updated_at: now,
   });
 
   await openScene(sceneId);
