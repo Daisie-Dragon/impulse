@@ -1143,16 +1143,7 @@ button {
   opacity: 0.4;
 }
 
-/* While actively dragging — ghost hidden, chosen card dims slightly */
-.list-item.sortable-ghost,
-.idea-card.sortable-ghost {
-  opacity: 0;
-}
 
-.list-item.sortable-chosen,
-.idea-card.sortable-chosen {
-  opacity: 0.6;
-}
 
 /* Reorder toggle button in the nav header */
 .nav-header__reorder {
@@ -2552,3 +2543,8 @@ button {
 /* Sticky write header */
 [data-theme="dark"] #screen-sticky-write .write-header { background: rgba(30, 16, 16, 0.82) !important; }
 [data-theme="light"] #screen-sticky-write .write-header { background: rgba(253, 240, 238, 0.82) !important; }
+
+.list-item.sortable-chosen,
+.idea-card.sortable-chosen {
+  opacity: 0.5;
+}

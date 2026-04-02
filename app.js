@@ -1321,7 +1321,6 @@ async function renderScenesList(threadId) {
   sceneSortable = Sortable.create(list, {
     handle:    '.list-item__drag',
     animation: 150,
-    ghostClass:  'sortable-ghost',
     chosenClass: 'sortable-chosen',
     draggable:   '.list-item, .idea-card--thread',
     touchStartThreshold: 3,
