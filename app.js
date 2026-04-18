@@ -987,7 +987,7 @@ async function openSpark(sparkId) {
   document.getElementById('spark-finish-btn').hidden = false;
   document.getElementById('spark-edit-btn').hidden   = true;
 
-  autoResizeIdeaField();
+  resetIdeaFieldHeight();
   updateSparkFinishBtn();
 
   if (spark.is_complete) { openSparkViewMode(spark); return; }
@@ -1064,10 +1064,24 @@ function updateSparkFinishBtn() {
   btn.style.pointerEvents = hasContent ? 'all' : 'none';
 }
 
-function autoResizeIdeaField() {
+// Full reset — sets height correctly from scratch. Use on open only.
+function resetIdeaFieldHeight() {
   const field = document.getElementById('spark-idea-field');
   field.style.height = 'auto';
   field.style.height = field.scrollHeight + 'px';
+}
+
+// Grow-only resize — called on every keystroke.
+// Never collapses to 'auto', because that momentary collapse triggers
+// the browser's scroll-to-focused logic which on mobile (where the
+// visual viewport is smaller than the layout viewport due to the
+// keyboard) snaps the screen down past the keyboard on every keypress.
+function autoResizeIdeaField() {
+  const field = document.getElementById('spark-idea-field');
+  const needed = field.scrollHeight;
+  if (needed > field.offsetHeight) {
+    field.style.height = needed + 'px';
+  }
 }
 
 document.getElementById('spark-idea-field').addEventListener('input', () => {
