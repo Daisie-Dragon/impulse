@@ -16,6 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 
@@ -51,6 +52,11 @@
           <span class="mode-btn__sub">what would they do?</span>
         </button>
       </div>
+      <!-- Backup nudge — only shown when >7 days since last backup -->
+      <button class="backup-nudge hidden" id="backup-nudge" aria-label="Open settings to back up your data">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        it's been a while since your last backup
+      </button>
     </main>
   </div>
 
@@ -406,17 +412,20 @@
       <button class="back-btn" id="hyp-write-back-btn" aria-label="Back">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <div class="write-header__title-block">
-        <span class="write-header__label" id="hyp-write-character"></span>
-        <span class="write-header__sublabel" id="hyp-write-question"></span>
-      </div>
+      <span class="write-header__label" id="hyp-write-character"></span>
       <button class="write-edit-btn write-edit-btn--lavender" id="hyp-edit-btn" hidden>edit</button>
       <button class="write-finish-btn write-finish-btn--lavender" id="hyp-finish-btn">finish</button>
     </header>
     <div class="write-body">
+      <!-- Question display — read-only, always visible above the answer -->
+      <div class="hyp-question-block" id="hyp-question-block">
+        <p class="hyp-question-display" id="hyp-write-question"></p>
+        <div class="hyp-question-divider"></div>
+      </div>
+
       <textarea
         id="hyp-textarea"
-        class="write-textarea"
+        class="write-textarea hyp-answer-textarea"
         placeholder="how would they answer…"
         spellcheck="true"
         autocorrect="on"
@@ -540,8 +549,14 @@
 
       <div class="settings-section">
         <p class="settings-section__label">Backup</p>
-        <button class="btn-primary" id="export-btn">Export all data</button>
-        <p class="settings-section__hint">Downloads a JSON file with all your threads, scenes, sparks, hypotheticals, and characters. Keep it somewhere safe.</p>
+        <button class="btn-primary" id="export-btn">Export backup (.json)</button>
+        <p class="settings-section__hint">Downloads a JSON file with all your data. Use this to restore Impulse on a new device or after clearing storage.</p>
+      </div>
+
+      <div class="settings-section">
+        <p class="settings-section__label">Export for reading</p>
+        <button class="btn-primary btn-primary--lavender" id="export-md-btn">Export as Markdown (.zip)</button>
+        <p class="settings-section__hint">Downloads a zip of clean .md files — your threads, sparks, and hypotheticals as readable documents. Great for Obsidian.</p>
       </div>
 
       <div class="settings-section">

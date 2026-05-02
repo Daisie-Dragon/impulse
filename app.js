@@ -250,6 +250,7 @@ function showScreen(id) {
     target.scrollTop = 0;
   }
   if (id !== 'home') history.pushState({ screen: id }, '', '');
+  if (id === 'home') checkBackupNudge();
 }
 
 // Android hardware / gesture back button
@@ -2122,6 +2123,8 @@ document.getElementById('export-btn').addEventListener('click', async () => {
     a.download     = `impulse-backup-${date}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    localStorage.setItem('impulse-last-backup', Date.now().toString());
+    checkBackupNudge();
     closeSettings();
   } catch (err) {
     console.error('Export failed:', err);
@@ -2308,8 +2311,188 @@ applyTheme(localStorage.getItem('impulse-theme') || 'system');
 
 
 /* ╔═══════════════════════════════════════════════════╗
-   ║  13. SERVICE WORKER & INIT                        ║
+   ║  14. MARKDOWN EXPORT                              ║
    ╚═══════════════════════════════════════════════════╝ */
+
+// Strips characters that are illegal or annoying in file/folder names.
+function sanitiseFilename(str) {
+  if (!str || !str.trim()) return 'Untitled';
+  return str
+    .trim()
+    .replace(/[\\/:*?"<>|]/g, '')   // illegal on Windows/Android
+    .replace(/\.{2,}/g, '.')        // no double dots
+    .replace(/\s+/g, ' ')           // collapse whitespace
+    .slice(0, 80)                   // keep paths sane
+    .trim() || 'Untitled';
+}
+
+// Builds the text content of a single markdown file.
+// No title heading — the filename is the only identifier.
+function buildMarkdownFile({ synopsis, body }) {
+  const parts = [];
+  if (synopsis) parts.push(`> ${synopsis}\n`);
+  if (synopsis && body) parts.push('');
+  if (body)     parts.push(body.trim());
+  return parts.join('\n') + '\n';
+}
+
+document.getElementById('export-md-btn').addEventListener('click', async () => {
+  try {
+    const zip = new JSZip();
+    const date = new Date().toISOString().slice(0, 10);
+    const root = zip.folder(`impulse-${date}`);
+
+    // ── Continue: threads → scenes ───────────────────
+    const continueFolder = root.folder('continue');
+    const threads = await dbGetAll('threads');
+    threads.sort((a, b) => a.created_at - b.created_at);
+
+    for (const thread of threads) {
+      const threadName   = sanitiseFilename(thread.title);
+      const threadFolder = continueFolder.folder(threadName);
+
+      const scenes = await dbGetByIndex('scenes', 'thread_id', thread.id);
+      // Sort by sort_order then created_at (mirrors the in-app order)
+      scenes.sort((a, b) => {
+        const aHas = a.sort_order != null, bHas = b.sort_order != null;
+        if (!aHas && !bHas) return a.created_at - b.created_at;
+        if (!aHas) return -1;
+        if (!bHas) return 1;
+        return a.sort_order - b.sort_order;
+      });
+
+      for (let i = 0; i < scenes.length; i++) {
+        const scene    = scenes[i];
+        const num      = String(i + 1).padStart(2, '0');
+        const name     = sanitiseFilename(scene.title || `Scene ${i + 1}`);
+        const filename = `${num} - ${name}.md`;
+
+        let content = buildMarkdownFile({
+          synopsis: scene.synopsis || null,
+          body:     scene.body    || '',
+        });
+
+        // Append any scene-level spark ideas after a divider
+        const sceneSparks = await getSparksByParent(scene.id);
+        if (sceneSparks.length) {
+          sceneSparks.sort((a, b) => a.created_at - b.created_at);
+          content += '\n---\n';
+          sceneSparks.forEach(s => {
+            content += `\n### ${s.title || plainFirstLine(s.body) || 'Untitled idea'}\n`;
+            if (s.body && s.body.trim()) content += '\n' + s.body.trim() + '\n';
+          });
+        }
+
+        threadFolder.file(filename, content);
+      }
+
+      // Thread-level spark ideas as _[threadname] ideas.md
+      const threadSparks = await getSparksByParent(thread.id);
+      if (threadSparks.length) {
+        let ideasContent = '';
+        threadSparks.sort((a, b) => a.created_at - b.created_at);
+        threadSparks.forEach((s, idx) => {
+          if (idx > 0) ideasContent += '\n---\n\n';
+          ideasContent += `### ${s.title || plainFirstLine(s.body) || 'Untitled idea'}\n`;
+          if (s.body && s.body.trim()) ideasContent += '\n' + s.body.trim() + '\n';
+        });
+        threadFolder.file(`_${threadName} ideas.md`, ideasContent);
+      }
+    }
+
+    // ── Spark ─────────────────────────────────────────
+    const sparkFolder  = root.folder('spark');
+    const allSparks    = await dbGetAll('sparks');
+    const rootSparks   = allSparks.filter(s => !s.parent_type);
+    rootSparks.sort((a, b) => a.created_at - b.created_at);
+
+    rootSparks.forEach(spark => {
+      const title    = spark.title || plainFirstLine(spark.body) || 'Untitled';
+      const filename = sanitiseFilename(title) + '.md';
+      const content  = buildMarkdownFile({
+        synopsis: null,
+        body:     spark.body || '',
+      });
+      sparkFolder.file(filename, content);
+    });
+
+    // ── Hypotheticals ─────────────────────────────────
+    const hypFolder  = root.folder('hypotheticals');
+    const hyps       = await dbGetAll('hypotheticals');
+    const characters = await dbGetAll('characters');
+    const charMap    = new Map(characters.map(c => [c.id, c]));
+    hyps.sort((a, b) => a.created_at - b.created_at);
+
+    for (const hyp of hyps) {
+      const folderName   = sanitiseFilename(hyp.question);
+      const hypSubFolder = hypFolder.folder(folderName);
+
+      const answers = await dbGetByIndex('hyp_answers', 'hypothetical_id', hyp.id);
+      answers.sort((a, b) => {
+        const ca = charMap.get(a.character_id);
+        const cb = charMap.get(b.character_id);
+        return (ca?.name || '').localeCompare(cb?.name || '');
+      });
+
+      answers.forEach(answer => {
+        const char     = charMap.get(answer.character_id);
+        const charName = sanitiseFilename(char?.name || 'Unknown');
+        const content  = buildMarkdownFile({
+          synopsis: null,
+          body:     answer.body || '',
+        });
+        hypSubFolder.file(`${charName}.md`, content);
+      });
+    }
+
+    // ── Generate & download ───────────────────────────
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `impulse-${date}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeSettings();
+
+  } catch (err) {
+    console.error('Markdown export failed:', err);
+    alert('Export failed. Please try again.');
+  }
+});
+
+
+/* ╔═══════════════════════════════════════════════════╗
+   ║  15. BACKUP NUDGE                                 ║
+   ╚═══════════════════════════════════════════════════╝ */
+
+const BACKUP_NUDGE_DAYS = 7;
+
+function checkBackupNudge() {
+  const nudge    = document.getElementById('backup-nudge');
+  const lastStr  = localStorage.getItem('impulse-last-backup');
+  if (!lastStr) {
+    // Never backed up — show nudge only if there's actually data worth backing up.
+    // We check this async and show if so.
+    dbGetAll('threads').then(threads => {
+      if (threads.length > 0) nudge.classList.remove('hidden');
+    }).catch(() => {});
+    return;
+  }
+  const daysSince = (Date.now() - parseInt(lastStr, 10)) / (1000 * 60 * 60 * 24);
+  if (daysSince >= BACKUP_NUDGE_DAYS) {
+    nudge.classList.remove('hidden');
+  } else {
+    nudge.classList.add('hidden');
+  }
+}
+
+// Tapping the nudge opens settings so they can export right away.
+document.getElementById('backup-nudge').addEventListener('click', () => {
+  openSettings();
+});
+
+
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -2320,5 +2503,8 @@ if ('serviceWorker' in navigator) {
 }
 
 openDB()
-  .then(() => console.log('Impulse: database ready ✓'))
+  .then(() => {
+    console.log('Impulse: database ready ✓');
+    checkBackupNudge();
+  })
   .catch(err => console.error('Impulse: database error', err));
