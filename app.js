@@ -2326,6 +2326,12 @@ function sanitiseFilename(str) {
     .trim() || 'Untitled';
 }
 
+// Returns the first N words of a string, for use as a short filename.
+function firstFiveWords(str, n = 5) {
+  if (!str || !str.trim()) return 'Untitled';
+  return str.trim().split(/\s+/).slice(0, n).join(' ');
+}
+
 // Builds the text content of a single markdown file.
 // No title heading — the filename is the only identifier.
 function buildMarkdownFile({ synopsis, body }) {
@@ -2376,10 +2382,10 @@ document.getElementById('export-md-btn').addEventListener('click', async () => {
         const sceneSparks = await getSparksByParent(scene.id);
         if (sceneSparks.length) {
           sceneSparks.sort((a, b) => a.created_at - b.created_at);
-          content += '\n---\n';
+          content += '\n---\n\n### Ideas\n';
           sceneSparks.forEach(s => {
-            content += `\n### ${s.title || plainFirstLine(s.body) || 'Untitled idea'}\n`;
-            if (s.body && s.body.trim()) content += '\n' + s.body.trim() + '\n';
+            const ideaText = s.body || s.title || 'Untitled idea';
+            content += '\n> ' + ideaText.trim() + '\n';
           });
         }
 
@@ -2392,9 +2398,9 @@ document.getElementById('export-md-btn').addEventListener('click', async () => {
         let ideasContent = '';
         threadSparks.sort((a, b) => a.created_at - b.created_at);
         threadSparks.forEach((s, idx) => {
-          if (idx > 0) ideasContent += '\n---\n\n';
-          ideasContent += `### ${s.title || plainFirstLine(s.body) || 'Untitled idea'}\n`;
-          if (s.body && s.body.trim()) ideasContent += '\n' + s.body.trim() + '\n';
+          if (idx > 0) ideasContent += '\n';
+          const ideaText = s.body || s.title || 'Untitled idea';
+          ideasContent += '> ' + ideaText.trim() + '\n';
         });
         threadFolder.file(`_${threadName} ideas.md`, ideasContent);
       }
@@ -2407,12 +2413,15 @@ document.getElementById('export-md-btn').addEventListener('click', async () => {
     rootSparks.sort((a, b) => a.created_at - b.created_at);
 
     rootSparks.forEach(spark => {
-      const title    = spark.title || plainFirstLine(spark.body) || 'Untitled';
-      const filename = sanitiseFilename(title) + '.md';
-      const content  = buildMarkdownFile({
-        synopsis: null,
-        body:     spark.body || '',
-      });
+      const ideaText = spark.title || spark.body || 'Untitled';
+      const filename = sanitiseFilename(firstFiveWords(ideaText)) + '.md';
+
+      let content = '';
+      if (ideaText.trim()) content += '> ' + ideaText.trim() + '\n';
+      if (spark.body && spark.title && spark.body.trim()) {
+        content += '\n---\n\n' + spark.body.trim() + '\n';
+      }
+
       sparkFolder.file(filename, content);
     });
 
@@ -2424,7 +2433,7 @@ document.getElementById('export-md-btn').addEventListener('click', async () => {
     hyps.sort((a, b) => a.created_at - b.created_at);
 
     for (const hyp of hyps) {
-      const folderName   = sanitiseFilename(hyp.question);
+      const folderName   = sanitiseFilename(firstFiveWords(hyp.question));
       const hypSubFolder = hypFolder.folder(folderName);
 
       const answers = await dbGetByIndex('hyp_answers', 'hypothetical_id', hyp.id);
@@ -2437,10 +2446,12 @@ document.getElementById('export-md-btn').addEventListener('click', async () => {
       answers.forEach(answer => {
         const char     = charMap.get(answer.character_id);
         const charName = sanitiseFilename(char?.name || 'Unknown');
-        const content  = buildMarkdownFile({
-          synopsis: null,
-          body:     answer.body || '',
-        });
+
+        let content = '> ' + hyp.question.trim() + '\n';
+        if (answer.body && answer.body.trim()) {
+          content += '\n---\n\n' + answer.body.trim() + '\n';
+        }
+
         hypSubFolder.file(`${charName}.md`, content);
       });
     }

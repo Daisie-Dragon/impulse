@@ -10,7 +10,7 @@
    Just bump the CACHE_NAME version when we push updates.
 ═══════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'impulse-v4';
+const CACHE_NAME = 'impulse-v5';
 
 // All the files that make up the app
 const ASSETS = [
