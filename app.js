@@ -2326,7 +2326,14 @@ function sanitiseFilename(str) {
     .trim() || 'Untitled';
 }
 
-// Returns the first N words of a string, for use as a short filename.
+// Converts any multi-line / multi-paragraph text into a proper markdown blockquote.
+// Every line (including blank lines between paragraphs) gets a "> " prefix,
+// which prevents blank lines from breaking out of the blockquote block.
+function toBlockquote(str) {
+  return str.trim().split('\n').map(line => '> ' + line).join('\n');
+}
+
+
 function firstFiveWords(str, n = 5) {
   if (!str || !str.trim()) return 'Untitled';
   return str.trim().split(/\s+/).slice(0, n).join(' ');
@@ -2336,7 +2343,7 @@ function firstFiveWords(str, n = 5) {
 // No title heading — the filename is the only identifier.
 function buildMarkdownFile({ synopsis, body }) {
   const parts = [];
-  if (synopsis) parts.push(`> ${synopsis}\n`);
+  if (synopsis) parts.push(toBlockquote(synopsis) + '\n');
   if (synopsis && body) parts.push('');
   if (body)     parts.push(body.trim());
   return parts.join('\n') + '\n';
@@ -2385,7 +2392,7 @@ document.getElementById('export-md-btn').addEventListener('click', async () => {
           content += '\n---\n\n### Ideas\n';
           sceneSparks.forEach(s => {
             const ideaText = s.body || s.title || 'Untitled idea';
-            content += '\n> ' + ideaText.trim() + '\n';
+            content += '\n' + toBlockquote(ideaText) + '\n';
           });
         }
 
@@ -2400,7 +2407,7 @@ document.getElementById('export-md-btn').addEventListener('click', async () => {
         threadSparks.forEach((s, idx) => {
           if (idx > 0) ideasContent += '\n';
           const ideaText = s.body || s.title || 'Untitled idea';
-          ideasContent += '> ' + ideaText.trim() + '\n';
+          ideasContent += toBlockquote(ideaText) + '\n';
         });
         threadFolder.file(`_${threadName} ideas.md`, ideasContent);
       }
@@ -2417,7 +2424,7 @@ document.getElementById('export-md-btn').addEventListener('click', async () => {
       const filename = sanitiseFilename(firstFiveWords(ideaText)) + '.md';
 
       let content = '';
-      if (ideaText.trim()) content += '> ' + ideaText.trim() + '\n';
+      if (ideaText.trim()) content += toBlockquote(ideaText) + '\n';
       if (spark.body && spark.title && spark.body.trim()) {
         content += '\n---\n\n' + spark.body.trim() + '\n';
       }
@@ -2447,7 +2454,7 @@ document.getElementById('export-md-btn').addEventListener('click', async () => {
         const char     = charMap.get(answer.character_id);
         const charName = sanitiseFilename(char?.name || 'Unknown');
 
-        let content = '> ' + hyp.question.trim() + '\n';
+        let content = toBlockquote(hyp.question) + '\n';
         if (answer.body && answer.body.trim()) {
           content += '\n---\n\n' + answer.body.trim() + '\n';
         }
